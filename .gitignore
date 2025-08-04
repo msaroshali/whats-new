@@ -1,0 +1,11 @@
+# Eclipse files
+.project
+.classpath
+.settings/
+
+# Maven compiled files
+target/
+
+# Local settings
+*.iml
+.idea/
