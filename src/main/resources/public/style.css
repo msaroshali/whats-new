@@ -1,0 +1,22 @@
+body {
+    font-family: sans-serif;
+    margin: 40px;
+  }
+  input {
+    padding: 8px;
+    width: 300px;
+  }
+  button {
+    padding: 8px 12px;
+    margin-left: 10px;
+  }
+  #results {
+    margin-top: 20px;
+  }
+  p {
+    background: #f0f0f0;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  
