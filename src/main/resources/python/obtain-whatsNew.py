@@ -1,19 +1,46 @@
 import sys
 import json
-import snscrape.modules.twitter as sntwitter
-from datetime import datetime, timedelta
+import tweepy
+
 
 keyword = sys.argv[1]
-since_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-query = f'{keyword} since:{since_date}'
+account = sys.argv[2]
+twitterToken = sys.argv[3]
+ 
+# 1. Twitter API credentials
+BEARER_TOKEN = twitterToken
 
-results = []
-for i, tweet in enumerate(sntwitter.TwitterSearchScraper(query).get_items()):
-    if i > 20:
-        break
-    results.append({
-        "date": tweet.date.isoformat(),
-        "content": tweet.content
-    })
+# 2. Create Twitter API client
+client = tweepy.Client(bearer_token=BEARER_TOKEN)
 
-print(json.dumps(results))
+# 3. Get keyword from Java arguments
+if len(sys.argv) < 3:
+    print("[]")
+    sys.exit(0)
+
+
+# # Build query for a specific account
+# Example: "India from:BBCBreaking"
+query = f"{keyword} from:{account}"
+
+# 4. Search recent tweets 
+
+tweets_data = []
+try:
+    tweets = client.search_recent_tweets(
+        query=query,
+        tweet_fields=["created_at", "text", "author_id", "lang"],
+        max_results=10
+    )
+
+    for tweet in tweets.data or []:
+        tweets_data.append({
+            "date": str(tweet.created_at),
+            "content": tweet.text
+        })
+
+except Exception as e:
+    tweets_data.append({"error": str(e)})
+
+# 5. Print the results as JSON
+print(json.dumps(tweets_data))

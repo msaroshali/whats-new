@@ -10,13 +10,20 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class Obtainer {
     public static List<Map<String, String>> getTweets(String keyword, String username) throws Exception {
+
+        Dotenv dotenv = Dotenv.load();
+        String twitterToken = dotenv.get("BEARER_TOKEN");
+
         ProcessBuilder pb = new ProcessBuilder(
             "C:\\Users\\PC 3\\eclipse-workspace\\aboutNew\\.venv\\Scripts\\python.exe",
             "src/main/resources/python/obtain-whatsNew.py", 
             keyword != null ? keyword : "",
-            username != null ? username : ""
+            username != null ? username : "",
+            twitterToken != null ? twitterToken : ""
         );
         pb.redirectErrorStream(true);
         Process process = pb.start();
