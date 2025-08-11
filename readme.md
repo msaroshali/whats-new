@@ -5,3 +5,7 @@ Future work includes leveraging AI to summarise news collected from different so
 
 # Current version
 A basic web app using twitter API to obtain tweets. 
+
+# Technology
+Uses Javalin as a web server. Javalin is a minuscule web server framework comes as a small wrapper wrapped over ninja jetty.
+Using simple BootStrap, JavaScript for frontend at the moment.
