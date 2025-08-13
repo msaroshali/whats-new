@@ -14,7 +14,7 @@ public class Find {
 	}
 	
 	public static void main(String[] args) {
-        var app = Javalin.create(config -> {
+        Javalin.create(config -> {
             config.staticFiles.add("/public", Location.CLASSPATH);
         })
         .get("/search", ctx -> {
