@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>Twitter News Search</title>
@@ -6,10 +6,48 @@
 </head>
 <body>
   <h1>Twitter News Search</h1>
-  <input type="text" id="keyword" placeholder="Enter keyword (e.g., India)">
+  <input type="text" id="keyword" placeholder="Enter keyword (e.g., China)">
   <input type="text" id="username" placeholder="Enter username (e.g., clashreport)">
   <button onclick="search()">Search</button>
   <div id="results"></div>
   <script src="script.js"></script>
+</body>
+</html>
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whats New</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="search-options">
+            <div class="search-container">
+                <input type="text" id="keyword" class="search-bar" placeholder="Search by keyword...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="search-container">
+                <input type="text" id="username" class="search-bar" placeholder="Search by username...">
+                <i class="fas fa-user search-icon"></i>
+            </div>
+            
+        </div>
+        <button class="search-button" onclick="search()">Search</button>  
+        
+        <div class="gallery">
+            <div class="thumbnail" data-id="thumb-001">
+                <img src="clash-report.jpg" alt="Thumbnail 1">
+                <i class="fas fa-check-circle check-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
