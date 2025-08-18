@@ -28,7 +28,8 @@ public class Obtainer {
             username != null ? username : ""
             //twitterToken != null ? twitterToken : ""
         );
-        pb.redirectErrorStream(true);
+
+        // pb.redirectErrorStream(true);
         Process process = pb.start();
     
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -62,7 +63,7 @@ public class Obtainer {
                 Map<String, String> tweet = new HashMap<>();
                 if (o.has("date")) tweet.put("date", o.getString("date"));
                 if (o.has("content")) tweet.put("content", o.getString("content"));
-                if (o.has("error")) tweet.put("error", o.getString("error"));
+                //if (o.has("error")) tweet.put("error", o.getString("error"));
                 tweets.add(tweet);
             }
             return tweets;
