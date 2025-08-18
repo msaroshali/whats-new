@@ -18,12 +18,15 @@ public class Obtainer {
         Dotenv dotenv = Dotenv.load();
         String twitterToken = dotenv.get("BEARER_TOKEN");
 
+        String nodePath = "c:\\Program Files\\nodejs\\node.exe";
+        String scriptPath = "src\\main\\resources\\node\\simpleGetTweetScript.js";
+
         ProcessBuilder pb = new ProcessBuilder(
-            "C:\\Users\\PC 3\\eclipse-workspace\\aboutNew\\.venv\\Scripts\\python.exe",
-            "src/main/resources/python/obtain-whatsNew.py", 
+            nodePath,
+            scriptPath, 
             keyword != null ? keyword : "",
-            username != null ? username : "",
-            twitterToken != null ? twitterToken : ""
+            username != null ? username : ""
+            //twitterToken != null ? twitterToken : ""
         );
         pb.redirectErrorStream(true);
         Process process = pb.start();
@@ -36,11 +39,11 @@ public class Obtainer {
         }
     
         String outputStr = output.toString().trim();
-        System.out.println("*******************PYTHON OUTPUT:\n*************" + outputStr);
+        System.out.println("*******************Node OUTPUT:\n*************" + outputStr);
     
         if (!outputStr.startsWith("[") && !outputStr.startsWith("{")) {
-            System.err.println("Python script did not return valid JSON: " + outputStr);
-            return Collections.singletonList(Map.of("error", "Invalid JSON from Python"));
+            System.err.println("nodeJs script did not return valid JSON: " + outputStr);
+            return Collections.singletonList(Map.of("error", "Invalid JSON from nodeJs script: " + outputStr));
         }
         
         try {
