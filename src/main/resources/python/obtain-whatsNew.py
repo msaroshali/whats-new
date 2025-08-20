@@ -20,7 +20,6 @@ if len(sys.argv) < 3:
 
 
 # # Build query for a specific account
-# Example: "India from:BBCBreaking"
 query = f"{keyword} from:{account}"
 
 # 4. Search recent tweets 
