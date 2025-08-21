@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 body {
     font-family: sans-serif;
     margin: 40px;
@@ -77,12 +79,7 @@ body {
   margin: 0 auto; /* This centers the button horizontally */
   padding: 0.75rem 2rem;
   font-size: 1rem;
-  font-weight: ;
-  color: ;
-  border: ;
-  border-radius: ;
-  cursor: pointer;
-  transition: ;
+
   margin-bottom: 2rem; /* Add a bottom margin to separate it from the gallery */
 }
 
