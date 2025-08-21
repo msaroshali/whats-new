@@ -19,4 +19,125 @@ body {
     border-radius: 4px;
     margin-bottom: 10px;
   }
+  /* Basic reset and font styling */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+}
+
+/* Search Bar Styling */
+.search-options {
+  display: flex;
+  gap: 10rem;
+  margin-bottom: 2rem;
+}
+
+/* Search Bar Styling */
+.search-container {
+  position: relative;
+  flex-grow: 1; /* Allows each search bar to grow and fill available space */
+}
+
+.search-bar {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-bar:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* Icons */
+.search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+}
+
+/* Submit Button Styling */
+.search-button {
+  display: block; /* Make it a block element to center with margin */
+  margin: 0 auto; /* This centers the button horizontally */
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: ;
+  color: ;
+  border: ;
+  border-radius: ;
+  cursor: pointer;
+  transition: ;
+  margin-bottom: 2rem; /* Add a bottom margin to separate it from the gallery */
+}
+
+
+
+
+/* Gallery and Thumbnail Styling */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.thumbnail {
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.thumbnail:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Checkmark Icon Styling */
+.check-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #fff;
+  font-size: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 2px;
+  display: none; /* Initially hidden */
+}
+
+/* Selected State */
+.thumbnail.selected {
+  box-shadow: 0 0 0 4px #007bff; /* Blue glow for selected item */
+  transform: scale(0.98); /* Slight scale down to indicate selection */
+}
+
+.thumbnail.selected .check-icon {
+  display: block; /* Show the checkmark when selected */
+  background-color: #007bff; /* **Change this to highlight the checkmark** */
+  color: #fff; /* Keep the icon color white for contrast */
+}
   

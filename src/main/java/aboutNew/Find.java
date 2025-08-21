@@ -7,14 +7,9 @@ import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 
 public class Find {
-
-	public static String world() {
-		 String w =  "World";
-		 return w;
-	}
 	
 	public static void main(String[] args) {
-        var app = Javalin.create(config -> {
+        Javalin.create(config -> {
             config.staticFiles.add("/public", Location.CLASSPATH);
         })
         .get("/search", ctx -> {
@@ -32,7 +27,4 @@ public class Find {
         })
             .start(7070);
     }
-	
-    
-
 }

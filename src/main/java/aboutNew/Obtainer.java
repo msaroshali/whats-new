@@ -16,16 +16,24 @@ public class Obtainer {
     public static List<Map<String, String>> getTweets(String keyword, String username) throws Exception {
 
         Dotenv dotenv = Dotenv.load();
-        String twitterToken = dotenv.get("BEARER_TOKEN");
+        String twitterToken = dotenv.get("X_AUTH_TOKEN");
+        String xCookie = dotenv.get("X_COOKIE");
+        String xCSRF = dotenv.get("X_CSRF_TOKEN");
+
+        String nodePath = "c:\\Program Files\\nodejs\\node.exe";
+        String scriptPath = "src\\main\\resources\\node\\simpleGetTweetScript.js";
 
         ProcessBuilder pb = new ProcessBuilder(
-            "C:\\Users\\PC 3\\eclipse-workspace\\aboutNew\\.venv\\Scripts\\python.exe",
-            "src/main/resources/python/obtain-whatsNew.py", 
+            nodePath,
+            scriptPath, 
             keyword != null ? keyword : "",
             username != null ? username : "",
-            twitterToken != null ? twitterToken : ""
+            twitterToken != null ? twitterToken : "",
+            xCookie != null ? xCookie : "",
+            xCSRF != null ? xCSRF : ""
         );
-        pb.redirectErrorStream(true);
+
+        // pb.redirectErrorStream(true);
         Process process = pb.start();
     
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -36,11 +44,11 @@ public class Obtainer {
         }
     
         String outputStr = output.toString().trim();
-        System.out.println("*******************PYTHON OUTPUT:\n*************" + outputStr);
+        System.out.println("*******************Node OUTPUT:\n*************" + outputStr);
     
         if (!outputStr.startsWith("[") && !outputStr.startsWith("{")) {
-            System.err.println("Python script did not return valid JSON: " + outputStr);
-            return Collections.singletonList(Map.of("error", "Invalid JSON from Python"));
+            System.err.println("nodeJs script did not return valid JSON: " + outputStr);
+            return Collections.singletonList(Map.of("error", "Invalid JSON from nodeJs script: " + outputStr));
         }
         
         try {
@@ -59,7 +67,7 @@ public class Obtainer {
                 Map<String, String> tweet = new HashMap<>();
                 if (o.has("date")) tweet.put("date", o.getString("date"));
                 if (o.has("content")) tweet.put("content", o.getString("content"));
-                if (o.has("error")) tweet.put("error", o.getString("error"));
+                //if (o.has("error")) tweet.put("error", o.getString("error"));
                 tweets.add(tweet);
             }
             return tweets;

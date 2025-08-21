@@ -30,3 +30,33 @@ function search() {
           document.getElementById("results").innerHTML = `<p style="color:red;">Fetch error: ${err}</p>`;
       });
 }
+document.addEventListener('DOMContentLoaded', () => {
+    const gallery = document.querySelector('.gallery');
+    const usernameField = document.getElementById('username');
+    let selectedIds = [];
+
+    // Event listener for clicking on a thumbnail
+    gallery.addEventListener('click', (event) => {
+        const thumbnail = event.target.closest('.thumbnail');
+        if (thumbnail) {
+            const thumbnailId = thumbnail.getAttribute('data-id');
+
+            // Fill the username field with the clicked thumbnail's id
+            usernameField.value = thumbnailId;
+
+            // Toggle the 'selected' class
+            thumbnail.classList.toggle('selected');
+
+            // Add or remove the ID from the selectedIds array
+            if (thumbnail.classList.contains('selected')) {
+                if (!selectedIds.includes(thumbnailId)) {
+                    selectedIds.push(thumbnailId);
+                }
+            } else {
+                selectedIds = selectedIds.filter(id => id !== thumbnailId);
+            }
+
+            console.log('Selected IDs:', selectedIds);
+        }
+    });
+});
