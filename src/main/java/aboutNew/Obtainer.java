@@ -16,7 +16,9 @@ public class Obtainer {
     public static List<Map<String, String>> getTweets(String keyword, String username) throws Exception {
 
         Dotenv dotenv = Dotenv.load();
-        String twitterToken = dotenv.get("BEARER_TOKEN");
+        String twitterToken = dotenv.get("X_AUTH_TOKEN");
+        String xCookie = dotenv.get("X_COOKIE");
+        String xCSRF = dotenv.get("X_CSRF_TOKEN");
 
         String nodePath = "c:\\Program Files\\nodejs\\node.exe";
         String scriptPath = "src\\main\\resources\\node\\simpleGetTweetScript.js";
@@ -25,8 +27,10 @@ public class Obtainer {
             nodePath,
             scriptPath, 
             keyword != null ? keyword : "",
-            username != null ? username : ""
-            //twitterToken != null ? twitterToken : ""
+            username != null ? username : "",
+            twitterToken != null ? twitterToken : "",
+            xCookie != null ? xCookie : "",
+            xCSRF != null ? xCSRF : ""
         );
 
         // pb.redirectErrorStream(true);
