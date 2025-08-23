@@ -53,13 +53,8 @@ function search() {
 
       results.innerHTML += tableHTML;
       new DataTable('#example', {
-        layout: {
-            bottomEnd: {
-                paging: {
-                    firstLast: false
-                }
-            }
-        }
+        ordering: false
+
     });
   })
   .catch(err => {
