@@ -43,5 +43,31 @@ public class TweetController {
             ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
         }
     }
-
+    public static void latest(Context ctx) {
+        try {
+            int limit = 10; // default
+            String limitParam = ctx.queryParam("limit");
+            if (limitParam != null) {
+                limit = Integer.parseInt(limitParam);
+            }
+    
+            List<Tweet> latestTweets = TweetDAO.getLatestTweets(limit);
+    
+            // Convert to JSON-friendly list of maps
+            List<Map<String, String>> response = new ArrayList<>();
+            for (Tweet t : latestTweets) {
+                response.add(Map.of(
+                    "username", t.getUsername(),
+                    "content", t.getContent(),
+                    "date", t.getDate()
+                ));
+            }
+    
+            ctx.json(response);
+    
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
+        }
+    }
 }
