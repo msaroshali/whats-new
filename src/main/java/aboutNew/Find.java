@@ -15,6 +15,7 @@ public class Find {
             config.staticFiles.add("/public", Location.CLASSPATH);
         })
         .get("/search", TweetController::search)
+        .get("/latest", TweetController::latest)
         .start(7070);
     }
 
