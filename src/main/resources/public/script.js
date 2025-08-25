@@ -93,3 +93,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+async function fetchLatest(limit = 50) {
+    const res = await fetch(`/latest?limit=${limit}`);
+    const tweets = await res.json();
+  
+    const resultsDiv = document.getElementById("results");
+    resultsDiv.innerHTML = ""; // clear old
+    
+    // 1. Create the table structure outside the loop
+       let tableHTML = `
+       <table id="example" class="display">
+           <thead>
+               <tr>
+                   <th>Source</th>
+                   <th>Date and Time</th>
+                   <th>Tweet</th>
+               </tr>
+           </thead>
+           <tbody>
+   `;
+
+    tweets.forEach(t => {
+        tableHTML += `
+        <tr>
+            <td>${t.username}</td>
+            <td>${t.date}</td>
+            <td>${t.content}</td>
+        </tr>
+    `;
+         // div.innerHTML = `<strong>@${t.username}</strong>: ${t.content} <em>(${t.date})</em>`;
+      //resultsDiv.appendChild(div);
+    });
+          tableHTML += `
+              </tbody>
+          </table>
+      `;
+
+      results.innerHTML += tableHTML;
+      new DataTable('#example', {
+        ordering: false
+
+    });
+
+  }
