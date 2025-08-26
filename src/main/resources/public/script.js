@@ -136,3 +136,32 @@ async function fetchLatest(limit = 50) {
     });
 
   }
+
+
+  // Dark mode toggle
+  // Theme toggle with persistence
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("theme-toggle");
+    const icon = toggleBtn.querySelector("i");
+  
+    // Load saved theme
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      icon.classList.remove("fa-moon");
+      icon.classList.add("fa-sun");
+    }
+  
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+  
+      if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+        icon.classList.remove("fa-moon");
+        icon.classList.add("fa-sun");
+      } else {
+        localStorage.setItem("theme", "light");
+        icon.classList.remove("fa-sun");
+        icon.classList.add("fa-moon");
+      }
+    });
+  });

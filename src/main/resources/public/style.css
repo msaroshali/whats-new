@@ -1,4 +1,84 @@
-@import "tailwindcss";
+/* Navbar Styling */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: #ffffff;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.brand {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.nav-links a {
+  margin: 0 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #007bff;
+}
+
+.theme-btn {
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Dark Mode */
+body.dark-mode {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+body.dark-mode .navbar {
+  background: #1f1f1f;
+  color: #e0e0e0;
+}
+
+body.dark-mode .search-bar {
+  background: #222;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+body.dark-mode p {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark-mode .thumbnail {
+  box-shadow: 0 4px 6px rgba(255,255,255,0.1);
+}
+
+body.dark-mode .nav-links a:hover {
+  color: #66b2ff;
+}
 
 body {
     font-family: sans-serif;
