@@ -1,19 +1,4 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-  <title>Twitter News Search</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Twitter News Search</h1>
-  <input type="text" id="keyword" placeholder="Enter keyword (e.g., China)">
-  <input type="text" id="username" placeholder="Enter username (e.g., clashreport)">
-  <button onclick="search()">Search</button>
-  <div id="results"></div>
-  <script src="script.js"></script>
-</body>
-</html>
- -->
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,8 +10,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.dataTables.css">
 </head>
-<body style="background-color:  #2b2b2b;">
-
+<body>
+<div>
+    <div>
+            <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <img src="clash-report.jpg" alt="Logo" class="logo">
+            <span class="brand">Whats New</span>
+        </div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#results">Latest Tweets</a>
+            <a href="#">About</a>
+        </div>
+        <div class="nav-right">
+            <button id="theme-toggle" class="theme-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+    </div>
     <div class="container">
         <div class="search-options">
             <div class="search-container">
@@ -53,7 +57,7 @@
             </div>
         </div>
         
-        <div class="container" id="results" style="background-color: #aaaaaa66;">
+        <div class="container" id="results">
             <h2>Search Results</h2>
             <div id="example">
                 <!-- Search results will be displayed here -->
@@ -61,6 +65,8 @@
         </div>
 
     </div>
+
+</div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <script src="script.js"></script>
