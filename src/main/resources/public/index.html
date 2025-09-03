@@ -1,76 +1,106 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whats New</title>
-    <link href="output.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.dataTables.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whats New</title>
+  <link href="output.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.dataTables.css">
 </head>
-<body>
-<div>
-    <div>
-            <!-- Navbar -->
-    <nav class="navbar">
-        <div class="nav-left">
-            <img src="logo-news.jpg" alt="Logo" class="logo">
-            <span class="brand">Whats New</span>
+<body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+
+        <!-- Left: Logo + Brand -->
+        <div class="flex items-center space-x-2">
+          <img src="logo-news.jpg" alt="Logo" class="h-10 w-10 rounded-full">
+          <span class="font-bold text-xl">Whats New</span>
         </div>
-        <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#results">Latest Tweets</a>
-            <a href="#">About</a>
+
+        <!-- Middle: Links -->
+        <div class="hidden md:flex space-x-6">
+          <a href="#" class="hover:text-blue-600">Home</a>
+          <a href="#results" class="hover:text-blue-600">Latest Tweets</a>
+          <a href="#" class="hover:text-blue-600">About</a>
         </div>
-        <div class="nav-right">
-            <button id="theme-toggle" class="theme-btn">
-                <i class="fas fa-moon"></i>
-            </button>
+
+        <!-- Right: Theme toggle -->
+        <div>
+          <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 transition">
+            <i class="fas fa-moon"></i>
+          </button>
         </div>
-    </nav>
+
+      </div>
     </div>
-    <div class="container">
-        <div class="search-options">
-            <div class="search-container">
-                <input type="text" id="keyword" class="search-bar" placeholder="Search by keyword...">
-                <i class="fas fa-search search-icon"></i>
-            </div>
-            <div class="search-container">
-                <input type="text" id="username" class="search-bar" placeholder="Search by username...">
-                <i class="fas fa-user search-icon"></i>
-            </div>
-            
-        </div>
-        <button class="search-button" onclick="search()">Breaking</button>  
-        <button class="search-button" onclick="fetchLatest()">Search</button>  
+  </nav>
 
-        <div class="gallery">
-            <div class="thumbnail" data-id="clashreport">
-                <img src="clash-report.jpg" alt="Thumbnail 1">
-                <i class="fas fa-check-circle check-icon"></i>
-            </div>            
-            <div class="thumbnail" data-id="faytuksnetwork">
-                <img src="faytuks-network.jpg" alt="Thumbnail 2">
-                <i class="fas fa-check-circle check-icon"></i>
-            </div>
-        </div>
-        
-        <div class="container" id="results">
-            <h2>Search Results</h2>
-            <div id="example">
-                <!-- Search results will be displayed here -->
-            </div>
-        </div>
+  <!-- Main Content -->
+  <main class="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+    <!-- Search Options -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="flex items-center bg-white rounded-lg shadow px-3 py-2">
+        <i class="fas fa-search text-gray-400 mr-2"></i>
+        <input type="text" id="keyword" placeholder="Search by keyword..." 
+               class="w-full outline-none text-gray-700 bg-transparent">
+      </div>
+      <div class="flex items-center bg-white rounded-lg shadow px-3 py-2">
+        <i class="fas fa-user text-gray-400 mr-2"></i>
+        <input type="text" id="username" placeholder="Search by username..." 
+               class="w-full outline-none text-gray-700 bg-transparent">
+      </div>
     </div>
 
-</div>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-    <script src="script.js"></script>
+    <!-- Action Buttons -->
+    <div class="flex space-x-4 mb-6">
+      <button onclick="search()" 
+              class="px-5 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition">
+        Breaking
+      </button>
+      <button onclick="fetchLatest()" 
+              class="px-5 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition">
+        Search
+      </button>
+    </div>
+
+
+    <div class="gallery grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
+        <div class="thumbnail relative cursor-pointer group rounded-lg overflow-hidden shadow-sm"
+             data-id="clashreport" aria-label="clashreport">
+          <img src="clash-report.jpg" alt="Clash Report" class="w-full h-40 sm:h-44 md:h-48 object-cover">
+          <!-- check icon hidden by default -->
+          <span class="check-icon absolute top-2 right-2 hidden bg-blue-600 text-white rounded-full p-1">
+            <i class="fas fa-check"></i>
+          </span>
+        </div>
+      
+        <div class="thumbnail relative cursor-pointer group rounded-lg overflow-hidden shadow-sm"
+             data-id="faytuksnetwork" aria-label="faytuksnetwork">
+          <img src="faytuks-network.jpg" alt="Faytuks Network" class="w-full h-40 sm:h-44 md:h-48 object-cover">
+          <span class="check-icon absolute top-2 right-2 hidden bg-blue-600 text-white rounded-full p-1">
+            <i class="fas fa-check"></i>
+          </span>
+        </div>
+    </div>    
+    <!-- Results -->
+    <section id="results" class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Search Results</h2>
+      <div id="example">
+        <!-- DataTables injects results here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
