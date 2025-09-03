@@ -61,37 +61,57 @@ function search() {
       document.getElementById("results").innerHTML = `<p style="color:red;">Fetch error: ${err}</p>`;
   });
 }
+
+//Gallery of news sources
 document.addEventListener('DOMContentLoaded', () => {
     const gallery = document.querySelector('.gallery');
     const usernameField = document.getElementById('username');
-
-    // Event listener for clicking on a thumbnail
+  
+    if (!gallery) return; // safety
+  
     gallery.addEventListener('click', (event) => {
-        const thumbnail = event.target.closest('.thumbnail');
-        if (thumbnail) {
-            const thumbnailId = thumbnail.getAttribute('data-id');
-
-            // Find the currently selected thumbnail, if any
-            const currentlySelected = gallery.querySelector('.thumbnail.selected');
-
-            // If a different thumbnail is already selected, deselect it
-            if (currentlySelected && currentlySelected !== thumbnail) {
-                currentlySelected.classList.remove('selected');
-            }
-
-            // Toggle the 'selected' class on the clicked thumbnail
-            thumbnail.classList.toggle('selected');
-
-            // If the thumbnail is now selected, update the username field
-            if (thumbnail.classList.contains('selected')) {
-                usernameField.value = thumbnailId;
-            } else {
-                // If the thumbnail is deselected, clear the username field
-                usernameField.value = '';
-            }
-        }
+      const thumbnail = event.target.closest('.thumbnail');
+      if (!thumbnail) return;
+  
+      const thumbnailId = thumbnail.getAttribute('data-id');
+  
+      // find previously selected thumbnail (single-select behavior)
+      const prev = gallery.querySelector('.thumbnail[data-selected="true"]');
+  
+      // If clicking the same selected thumbnail -> deselect
+      if (prev && prev === thumbnail) {
+        prev.removeAttribute('data-selected');
+        // remove selected utility classes
+        prev.classList.remove('ring-4', 'ring-blue-500', 'scale-95');
+        // hide its check icon
+        const prevCheck = prev.querySelector('.check-icon');
+        if (prevCheck) prevCheck.classList.add('hidden');
+  
+        // clear username field
+        if (usernameField) usernameField.value = '';
+        return;
+      }
+  
+      // Deselect previous if different
+      if (prev && prev !== thumbnail) {
+        prev.removeAttribute('data-selected');
+        prev.classList.remove('ring-4', 'ring-blue-500', 'scale-95');
+        const prevCheck = prev.querySelector('.check-icon');
+        if (prevCheck) prevCheck.classList.add('hidden');
+      }
+  
+      // Select this thumbnail
+      thumbnail.setAttribute('data-selected', 'true');
+      thumbnail.classList.add('ring-4', 'ring-blue-500', 'scale-95');
+  
+      // show check icon
+      const check = thumbnail.querySelector('.check-icon');
+      if (check) check.classList.remove('hidden');
+  
+      // write to username field
+      if (usernameField) usernameField.value = thumbnailId;
     });
-});
+  });
 
 async function fetchLatest(limit = 50) {
     const res = await fetch(`/latest?limit=${limit}`);
@@ -140,28 +160,37 @@ async function fetchLatest(limit = 50) {
 
   // Dark mode toggle
   // Theme toggle with persistence
+// Dark mode toggle with persistence for Tailwind
 document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("theme-toggle");
     const icon = toggleBtn.querySelector("i");
   
-    // Load saved theme
-    if (localStorage.getItem("theme") === "dark") {
-      document.body.classList.add("dark-mode");
+    // On page load → set theme from localStorage or system preference
+    if (
+      localStorage.theme === "dark" ||
+      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
+      document.documentElement.classList.add("dark");
       icon.classList.remove("fa-moon");
       icon.classList.add("fa-sun");
+    } else {
+      document.documentElement.classList.remove("dark");
+      icon.classList.remove("fa-sun");
+      icon.classList.add("fa-moon");
     }
   
+    // Toggle on button click
     toggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-  
-      if (document.body.classList.contains("dark-mode")) {
-        localStorage.setItem("theme", "dark");
+      const isDark = document.documentElement.classList.toggle("dark");
+      if (isDark) {
+        localStorage.theme = "dark";
         icon.classList.remove("fa-moon");
         icon.classList.add("fa-sun");
       } else {
-        localStorage.setItem("theme", "light");
+        localStorage.theme = "light";
         icon.classList.remove("fa-sun");
         icon.classList.add("fa-moon");
       }
     });
   });
+  
