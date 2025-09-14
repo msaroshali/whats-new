@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Whats New</title>
+  <script src="dark-themeScript.js"></script>
+  <title>Whats News</title>
   <link href="output.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.dataTables.css">
 </head>
-<body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-
+<body class="bg-white text-gray-900 dark:bg-black dark:text-white transition-colors duration-300">
   <!-- Navbar -->
-  <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
+  <nav class="bg-white dark:bg-gray-900 shadow-md fixed top-0 left-0 right-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
 
@@ -59,15 +59,14 @@
     <!-- Action Buttons -->
     <div class="flex space-x-4 mb-6">
       <button onclick="search()" 
-              class="px-5 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition">
+              class="px-5 py-2 rounded-lg bg-black-500 text-white font-medium hover:bg-red-600 transition">
         Breaking
       </button>
       <button onclick="fetchLatest()" 
-              class="px-5 py-2 rounded-lg bg-blue-500 text-white font-medium hover:bg-blue-600 transition">
+              class="px-5 py-2 rounded-lg bg-black-500 text-white font-medium hover:bg-blue-600 transition">
         Search
       </button>
     </div>
-
 
     <div class="gallery grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8">
         <div class="thumbnail relative cursor-pointer group rounded-lg overflow-hidden shadow-sm"
@@ -88,7 +87,7 @@
         </div>
     </div>    
     <!-- Results -->
-    <section id="results" class="bg-white shadow rounded-lg p-6">
+    <section id="results" class="rounded-lg p-6">
       <h2 class="text-xl font-bold mb-4">Search Results</h2>
       <div id="example">
         <!-- DataTables injects results here -->

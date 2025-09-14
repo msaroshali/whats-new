@@ -159,37 +159,27 @@ async function fetchLatest(limit = 50) {
 
 
   // Dark mode toggle
-  // Theme toggle with persistence
-// Dark mode toggle with persistence for Tailwind
-document.addEventListener("DOMContentLoaded", () => {
+
+  document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("theme-toggle");
-    const icon = toggleBtn.querySelector("i");
-  
-    // On page load → set theme from localStorage or system preference
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-      icon.classList.remove("fa-moon");
-      icon.classList.add("fa-sun");
-    } else {
-      document.documentElement.classList.remove("dark");
-      icon.classList.remove("fa-sun");
-      icon.classList.add("fa-moon");
+    const html = document.documentElement; // use <html> or <body>
+
+    if(localStorage.getItem("theme") === "dark") {
+        html.classList.add("dark");
     }
-  
-    // Toggle on button click
+
     toggleBtn.addEventListener("click", () => {
-      const isDark = document.documentElement.classList.toggle("dark");
-      if (isDark) {
-        localStorage.theme = "dark";
-        icon.classList.remove("fa-moon");
-        icon.classList.add("fa-sun");
+      html.classList.toggle("dark");
+
+      // optional: change icon
+      const icon = toggleBtn.querySelector("i");
+      if (html.classList.contains("dark")) {
+        localStorage.setItem("theme","dark");
+        icon.classList.replace("fa-moon", "fa-sun");
+        
       } else {
-        localStorage.theme = "light";
-        icon.classList.remove("fa-sun");
-        icon.classList.add("fa-moon");
+        localStorage.setItem("theme","light");
+        icon.classList.replace("fa-sun", "fa-moon");
       }
     });
   });
