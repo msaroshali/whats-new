@@ -25,6 +25,7 @@ function search() {
                   <tr>
                       <th>Date and Time</th>
                       <th>Tweet</th>
+                      <th>Source</th>
                   </tr>
               </thead>
               <tbody>
@@ -40,6 +41,7 @@ function search() {
                   <tr>
                       <td>${tweet.date}</td>
                       <td>${tweet.content}</td>
+                      <td>${tweet.sourceUrl}</td>
                   </tr>
               `;
           }

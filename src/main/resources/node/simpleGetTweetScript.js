@@ -127,9 +127,12 @@ fetch(fullUrl, {
             const entry = entries[i];
             try {
                 const legacy = entry.content.itemContent.tweet_results.result.legacy;
+                const srcUrlId = entry.content.itemContent.tweet_results.result.rest_id;
+                const url = `https://x.com/${username}/status/${srcUrlId}`;
                 tweets.push({
                     date: legacy.created_at,
-                    content: legacy.full_text
+                    content: legacy.full_text,
+                    sourceUrl: url
                 });
             } catch (err) {
                 // skip if structure not found
@@ -140,7 +143,7 @@ fetch(fullUrl, {
     }
 
         // return only the cleaned array to stdout to be picked up by Java
-        console.log(JSON.stringify(tweets, null, 2));
+        console.log(JSON.stringify(tweets, null, 3));
 
     console.error(`Successfully wrote the response to ${output_file}`);
 })
