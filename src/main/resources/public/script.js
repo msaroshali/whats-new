@@ -41,7 +41,7 @@ function search() {
                   <tr>
                       <td>${tweet.date}</td>
                       <td>${tweet.content}</td>
-                      <td>${tweet.sourceUrl}</td>
+                      <td><a href="${tweet.sourceUrl}" target="_blank">${tweet.sourceUrl}</a></td>
                   </tr>
               `;
           }
