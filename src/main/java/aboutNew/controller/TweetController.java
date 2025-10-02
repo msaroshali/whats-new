@@ -36,6 +36,7 @@ public class TweetController {
             System.out.println("Tweets saved to database successfully.");
 
             // Return JSON to frontend
+            ctx.contentType("application/json; charset=utf-8");
             ctx.json(rawTweets);
             
         } catch (Exception e) {
@@ -43,6 +44,7 @@ public class TweetController {
             ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
         }
     }
+    
     public static void latest(Context ctx) {
         try {
             int limit = 10; // default
@@ -62,6 +64,7 @@ public class TweetController {
                     "date", t.getDate()
                 ));
             }
+            ctx.contentType("application/json; charset=utf-8");
             ctx.json(response);
     
         } catch (Exception e) {
@@ -80,15 +83,17 @@ public class TweetController {
                 if (!rawTweets.isEmpty()) {
 
                     System.out.println("Auto Saving " + username.toUpperCase() + " tweets to database...");
+                    int insertedCount = 0;
                     for (Map<String, String> map : rawTweets) {
                         String date = map.getOrDefault("date", "");
                         String content = map.getOrDefault("content", "");
                         Tweet t = new Tweet(username, content, date);
 
-                        TweetDAO.saveTweet(t);
+                        insertedCount += TweetDAO.saveTweet(t);
 
 
                     }
+                    System.out.println("Tweets saved to database successfully. Inserted: " + insertedCount + ", Ignored: " + (rawTweets.size() - insertedCount));
 
                     System.out.println("Auto save of " + username.toUpperCase() + " tweets to database successful");
 
