@@ -120,36 +120,28 @@ fetch(fullUrl, {
     
 
     try {
-        
-        const instructions = data.data.search_by_raw_query.search_timeline.timeline.instructions;
-        const entries = instructions[0].entries;
+        const instructions = data?.data?.search_by_raw_query?.search_timeline?.timeline?.instructions;
+        const entries = instructions?.[0]?.entries || [];
 
         for (let i = 0; i < entries.length && tweets.length < 20; i++) {
             const entry = entries[i];
             try {
                 const legacy = entry.content.itemContent.tweet_results.result.legacy;
                 const srcUrlId = entry.content.itemContent.tweet_results.result.rest_id;
-                
-                if (username == "") {
-                   const usernameStr = entry.content.itemContent.tweet_results.result.core.user_results.result.core.screen_name;
-                   let url = `https://x.com/${usernameStr}/status/${srcUrlId}`;
 
-                   tweets.push({
+                let url;
+                if (!username) {
+                    const usernameStr = entry.content.itemContent.tweet_results.result.core.user_results.result.core.screen_name;
+                    url = `https://x.com/${usernameStr}/status/${srcUrlId}`;
+                } else {
+                    url = `https://x.com/${username}/status/${srcUrlId}`;
+                }
+
+                tweets.push({
                     date: legacy.created_at,
                     content: legacy.full_text,
                     sourceUrl: url
                 });
-                }
-                else{
-
-                    let url = `https://x.com/${username}/status/${srcUrlId}`;
-
-                    tweets.push({
-                        date: legacy.created_at,
-                        content: legacy.full_text,
-                        sourceUrl: url
-                    });
-                }                
             } catch (err) {
                 // skip if structure not found
             }
@@ -159,11 +151,13 @@ fetch(fullUrl, {
     }
 
         // return only the cleaned array to stdout to be picked up by Java
-        console.log(JSON.stringify(tweets, null, 3));
+    console.log(JSON.stringify(tweets, null, 3));
 
     console.error(`Successfully wrote the response to ${output_file}`);
 })
 .catch(e => {
     // Handle any errors
     console.error('An error occurred:', e);
+    // Still output valid JSON to stdout for Java
+    console.log(JSON.stringify([]));
 });
