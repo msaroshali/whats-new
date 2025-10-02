@@ -1,5 +1,9 @@
 package aboutNew;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import aboutNew.controller.TweetController;
 import aboutNew.db.SetupDB;
 import io.javalin.Javalin;
@@ -13,10 +17,13 @@ public class Find {
 
         Javalin.create(config -> {
             config.staticFiles.add("/public", Location.CLASSPATH);
+            config.http.defaultContentType = "application/json; charset=utf-8";
         })
         .get("/search", TweetController::search)
         .get("/latest", TweetController::latest)
         .start(7070);
+
+        startBackgroundJob();
     }
 
     public static void initializeDatabase() {
@@ -24,4 +31,12 @@ public class Find {
         SetupDB.init();
         System.out.println("Database initialized successfully.");
     }
+
+    private static void startBackgroundJob() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(() -> {
+                TweetController.fetchAndSaveDefaultSources();
+        }, 0, 63, TimeUnit.MINUTES);    
+    }
+
 }
