@@ -1,4 +1,4 @@
-function search() {
+function breaking() {
   const keyword = document.getElementById("keyword").value;
   const username = document.getElementById("username").value;
 
@@ -25,6 +25,7 @@ function search() {
                   <tr>
                       <th>Date and Time</th>
                       <th>Tweet</th>
+                      <th>Source</th>
                   </tr>
               </thead>
               <tbody>
@@ -40,6 +41,7 @@ function search() {
                   <tr>
                       <td>${tweet.date}</td>
                       <td>${tweet.content}</td>
+                      <td><a href="${tweet.sourceUrl}" target="_blank">${tweet.sourceUrl}</a></td>
                   </tr>
               `;
           }
@@ -113,8 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-async function fetchLatest(limit = 50) {
-    const res = await fetch(`/latest?limit=${limit}`);
+async function getNews() {
+    const res = await fetch(`/latest`);
+    // const res = await fetch(`/latest?limit=${limit}`);
     const tweets = await res.json();
   
     const resultsDiv = document.getElementById("results");

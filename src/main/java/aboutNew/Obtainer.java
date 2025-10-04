@@ -47,8 +47,8 @@ public class Obtainer {
         System.out.println("*******************Node OUTPUT:\n*************" + outputStr);
     
         if (!outputStr.startsWith("[") && !outputStr.startsWith("{")) {
-            System.err.println("nodeJs script did not return valid JSON: " + outputStr);
-            return Collections.singletonList(Map.of("error", "Invalid JSON from nodeJs script: " + outputStr));
+            System.err.println("nodeJs script returned THIS instead: " + "'" +outputStr+ "'");
+            return Collections.singletonList(Map.of("error", "Returned JSON from nodeJs script: " + "'" +outputStr+ "'"));
         }
         
         try {
@@ -67,13 +67,14 @@ public class Obtainer {
                 Map<String, String> tweet = new HashMap<>();
                 if (o.has("date")) tweet.put("date", o.getString("date"));
                 if (o.has("content")) tweet.put("content", o.getString("content"));
+                if (o.has("sourceUrl")) tweet.put("sourceUrl", o.getString("sourceUrl"));
                 //if (o.has("error")) tweet.put("error", o.getString("error"));
                 tweets.add(tweet);
             }
             return tweets;
         } catch (Exception e) {
             e.printStackTrace();
-            return Collections.singletonList(Map.of("error", e.getMessage()));
+            return Collections.singletonList(Map.of("error reading retrieved JSON", e.getMessage()));
         }
     }
 }

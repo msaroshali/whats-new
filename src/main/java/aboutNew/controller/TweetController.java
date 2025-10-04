@@ -36,6 +36,7 @@ public class TweetController {
             System.out.println("Tweets saved to database successfully.");
 
             // Return JSON to frontend
+            ctx.contentType("application/json; charset=utf-8");
             ctx.json(rawTweets);
             
         } catch (Exception e) {
@@ -43,17 +44,18 @@ public class TweetController {
             ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
         }
     }
+    
     public static void latest(Context ctx) {
         try {
-            int limit = 10; // default
-            String limitParam = ctx.queryParam("limit");
-            if (limitParam != null) {
-                limit = Integer.parseInt(limitParam);
-            }
+            int limit = 200; // default
+            // String limitParam = ctx.queryParam("limit");
+            // if (limitParam != null) {
+            //     limit = Integer.parseInt(limitParam);
+            // }
     
             List<Tweet> latestTweets = TweetDAO.getLatestTweets(limit);
     
-            // Convert to JSON-friendly list of maps
+            // Convert to JSON-friendly list of maps for displaying on the frontend
             List<Map<String, String>> response = new ArrayList<>();
             for (Tweet t : latestTweets) {
                 response.add(Map.of(
@@ -62,12 +64,50 @@ public class TweetController {
                     "date", t.getDate()
                 ));
             }
-    
+            ctx.contentType("application/json; charset=utf-8");
             ctx.json(response);
     
         } catch (Exception e) {
             e.printStackTrace();
             ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
+        }
+    }
+
+    public static void fetchAndSaveDefaultSources() {
+        try {
+            String[] usernames = {"faytuksnetwork", "clashreport",  "Wccftech", "TechCrunch", "verge", "engadget", "TechRadar", "Gizmodo", "TheNextWeb", "DigitalTrends"};
+
+            for (String username : usernames) {
+                List<Map<String, String>> rawTweets = Obtainer.getTweets("", username);
+
+                if (!rawTweets.isEmpty()) {
+
+                    System.out.println("Auto Saving " + username.toUpperCase() + " tweets to database...");
+                    int insertedCount = 0;
+                    for (Map<String, String> map : rawTweets) {
+                        String date = map.getOrDefault("date", "");
+                        String content = map.getOrDefault("content", "");
+                        Tweet t = new Tweet(username, content, date);
+
+                        insertedCount += TweetDAO.saveTweet(t);
+
+
+                    }
+                    System.out.println("Tweets saved to database successfully. Inserted: " + insertedCount + ", Ignored: " + (rawTweets.size() - insertedCount));
+
+                    System.out.println("Auto save of " + username.toUpperCase() + " tweets to database successful");
+
+                } 
+                else {
+                    System.out.println("No tweets found for " + username.toUpperCase() + ". Skipping...");
+                }
+
+                Thread.sleep(25000);
+
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
