@@ -47,11 +47,11 @@ public class TweetController {
     
     public static void latest(Context ctx) {
         try {
-            int limit = 10; // default
-            String limitParam = ctx.queryParam("limit");
-            if (limitParam != null) {
-                limit = Integer.parseInt(limitParam);
-            }
+            int limit = 200; // default
+            // String limitParam = ctx.queryParam("limit");
+            // if (limitParam != null) {
+            //     limit = Integer.parseInt(limitParam);
+            // }
     
             List<Tweet> latestTweets = TweetDAO.getLatestTweets(limit);
     

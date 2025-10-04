@@ -1,4 +1,4 @@
-function search() {
+function breaking() {
   const keyword = document.getElementById("keyword").value;
   const username = document.getElementById("username").value;
 
@@ -115,8 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-async function fetchLatest(limit = 50) {
-    const res = await fetch(`/latest?limit=${limit}`);
+async function getNews() {
+    const res = await fetch(`/latest`);
+    // const res = await fetch(`/latest?limit=${limit}`);
     const tweets = await res.json();
   
     const resultsDiv = document.getElementById("results");
