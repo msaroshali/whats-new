@@ -19,8 +19,8 @@ public class Find {
             config.staticFiles.add("/public", Location.CLASSPATH);
             config.http.defaultContentType = "application/json; charset=utf-8";
         })
-        .get("/search", TweetController::search)
-        .get("/latest", TweetController::latest)
+        .get("/search", TweetController::search) //Breaking() js
+        .get("/latest", TweetController::latest) //getNews() js
         .start(7070);
 
         startBackgroundJob();
