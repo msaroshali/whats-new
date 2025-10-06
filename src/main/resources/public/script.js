@@ -116,7 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 async function getNews() {
-    const res = await fetch(`/latest`);
+  const username = document.getElementById("username").value;
+
+    const res = await fetch(`/latest?username=${encodeURIComponent(username)}`);
     // const res = await fetch(`/latest?limit=${limit}`);
     const tweets = await res.json();
   

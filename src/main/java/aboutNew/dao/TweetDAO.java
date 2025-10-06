@@ -26,28 +26,37 @@ public class TweetDAO {
         }
     }
 
-public static List<Tweet> getLatestTweets(int limit) {
-        String sql = "SELECT username, content, date FROM tweets ORDER BY id DESC LIMIT ?";
-        List<Tweet> tweets = new ArrayList<>();
+public static List<Tweet> getLatestTweets(int limit, String usernameQ) {
+        
+ String sql;
+    List<Tweet> tweets = new ArrayList<>();
 
-        try (Connection conn = Database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+    try (Connection conn = Database.getConnection()) {
+        PreparedStatement pstmt;
+        if (usernameQ == null || usernameQ.isEmpty()) {
+            sql = "SELECT username, content, date FROM tweets ORDER BY id DESC LIMIT ?";
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, limit);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                String username = rs.getString("username");
-                String content = rs.getString("content");
-                String date = rs.getString("date");
-                tweets.add(new Tweet(username, content, date));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            sql = "SELECT username, content, date FROM tweets WHERE username = ? ORDER BY id DESC LIMIT ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, usernameQ);
+            pstmt.setInt(2, limit);
         }
 
-        return tweets;
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            String username = rs.getString("username");
+            String content = rs.getString("content");
+            String date = rs.getString("date");
+            tweets.add(new Tweet(username, content, date));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return tweets;
     }
 
 }
