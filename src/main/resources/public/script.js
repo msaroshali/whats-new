@@ -23,9 +23,10 @@ function breaking() {
           <table id="example" class="display">
               <thead>
                   <tr>
+                      <th>Source</th>
                       <th>Date and Time</th>
                       <th>Tweet</th>
-                      <th>Source</th>
+                      <th>Url</th>
                   </tr>
               </thead>
               <tbody>
@@ -39,6 +40,7 @@ function breaking() {
           } else {
               tableHTML += `
                   <tr>
+                      <td>${tweet.username}</td>
                       <td>${tweet.date}</td>
                       <td>${tweet.content}</td>
                       <td><a href="${tweet.sourceUrl}" target="_blank">${tweet.sourceUrl}</a></td>
@@ -133,6 +135,7 @@ async function getNews() {
                    <th>Source</th>
                    <th>Date and Time</th>
                    <th>Tweet</th>
+                   <th>Url</th>
                </tr>
            </thead>
            <tbody>
@@ -144,6 +147,7 @@ async function getNews() {
             <td>${t.username}</td>
             <td>${t.date}</td>
             <td>${t.content}</td>
+            <td>${t.sourceUrl}</td>
         </tr>
     `;
          // div.innerHTML = `<strong>@${t.username}</strong>: ${t.content} <em>(${t.date})</em>`;

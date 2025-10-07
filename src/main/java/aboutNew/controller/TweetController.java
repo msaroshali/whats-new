@@ -2,6 +2,7 @@ package aboutNew.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import aboutNew.Obtainer;
 import aboutNew.dao.TweetDAO;
@@ -24,7 +25,8 @@ public class TweetController {
             {
                 String date = map.getOrDefault("date","");
                 String content = map.getOrDefault("content", "");
-                Tweet t = new Tweet(username, content, date);
+                String source = map.getOrDefault("sourceUrl", "");
+                Tweet t = new Tweet(username, content, date, source);
                 fetchedTweets.add(t);   
             }
 
@@ -61,9 +63,10 @@ public class TweetController {
             List<Map<String, String>> response = new ArrayList<>();
             for (Tweet t : latestTweets) {
                 response.add(Map.of(
-                    "username", t.getUsername(),
-                    "content", t.getContent(),
-                    "date", t.getDate()
+                    "username", Objects.toString(t.getUsername(), ""),
+                    "content", Objects.toString(t.getContent(), ""),
+                    "date", Objects.toString(t.getDate(), ""),
+                    "sourceUrl", Objects.toString(t.getSource(), "") // saame as "sourceUrl", t.getSource() == null ? "" : t.getSource()
                 ));
             }
             ctx.contentType("application/json; charset=utf-8");
@@ -89,7 +92,8 @@ public class TweetController {
                     for (Map<String, String> map : rawTweets) {
                         String date = map.getOrDefault("date", "");
                         String content = map.getOrDefault("content", "");
-                        Tweet t = new Tweet(username, content, date);
+                        String source = map.getOrDefault("sourceUrl", "");
+                        Tweet t = new Tweet(username, content, date, source );
 
                         insertedCount += TweetDAO.saveTweet(t);
 

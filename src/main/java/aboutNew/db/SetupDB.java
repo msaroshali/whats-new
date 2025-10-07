@@ -19,6 +19,7 @@ public class SetupDB {
                     username TEXT,
                     content TEXT,
                     date TEXT,
+                    source TEXT,
                     UNIQUE(content, date)
                 )
             """);

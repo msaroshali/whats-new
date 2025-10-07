@@ -65,6 +65,7 @@ public class Obtainer {
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject o = arr.getJSONObject(i);
                 Map<String, String> tweet = new HashMap<>();
+                if (o.has("username")) tweet.put("username", o.getString("username"));
                 if (o.has("date")) tweet.put("date", o.getString("date"));
                 if (o.has("content")) tweet.put("content", o.getString("content"));
                 if (o.has("sourceUrl")) tweet.put("sourceUrl", o.getString("sourceUrl"));
