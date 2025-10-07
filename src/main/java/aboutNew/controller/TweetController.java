@@ -46,6 +46,8 @@ public class TweetController {
     }
     
     public static void latest(Context ctx) {
+                String username = ctx.queryParam("username");
+
         try {
             int limit = 200; // default
             // String limitParam = ctx.queryParam("limit");
@@ -53,7 +55,7 @@ public class TweetController {
             //     limit = Integer.parseInt(limitParam);
             // }
     
-            List<Tweet> latestTweets = TweetDAO.getLatestTweets(limit);
+            List<Tweet> latestTweets = TweetDAO.getLatestTweets(limit, username);
     
             // Convert to JSON-friendly list of maps for displaying on the frontend
             List<Map<String, String>> response = new ArrayList<>();
