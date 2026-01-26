@@ -8,4 +8,4 @@ A basic web app using twitter API to obtain tweets.
 
 # Technology
 Uses Javalin as a web server. Javalin is a minuscule web server framework comes as a small wrapper wrapped over ninja jetty.
-Using simple BootStrap, JavaScript for frontend at the moment.
+Using Tailwind, JavaScript for frontend at the moment.
