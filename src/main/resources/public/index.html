@@ -6,6 +6,7 @@
   <script src="dark-themeScript.js"></script>
   <title>Whats News</title>
   <link href="output.css" rel="stylesheet">
+  <link rel="stylesheet" href="styleAI.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.dataTables.css">
 </head>
@@ -150,6 +151,77 @@
           </span>
         </div>
     </div>    
+
+    <!-- Timeframe Summaries Section -->
+    <section id="summary-section" class="summary-section mb-8">
+      <div class="ai-summary-glow"></div>
+
+      <div class="summary-header">
+        
+        <i class="fas fa-newspaper summary-header-icon"></i>
+        <h2 class="summary-header-title">News Pulse Summary</h2>
+        <span class="summary-header-badge">AI Summaries</span>
+      </div>
+      <p class="summary-subtitle">Get an instant AI-generated overview of the latest news and events stored in the database.</p>
+      
+      <!-- Timeframe Tabs -->
+      <div class="summary-tabs flex space-x-2 mb-4 border-b border-gray-200 dark:border-gray-750 pb-2">
+        <button class="summary-tab-btn" onclick="fetchSummary('hour', this)">
+          <i class="far fa-clock mr-1"></i> Past Hour
+        </button>
+        <button class="summary-tab-btn" onclick="fetchSummary('day', this)">
+          <i class="far fa-calendar mr-1"></i> Past Day
+        </button>
+        <button class="summary-tab-btn" onclick="fetchSummary('week', this)">
+          <i class="far fa-calendar-alt mr-1"></i> Past Week
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div id="summary-loading" class="summary-loading" style="display: none;">
+        <div class="summary-spinner"></div>
+        <span>Retrieving news & synthesizing summary...</span>
+      </div>
+
+      <!-- Summary Response Card -->
+      <div id="summary-response" class="summary-response" style="display: none;">
+        <div class="summary-response-header">
+          <i class="fas fa-magic mr-1"></i>
+          <span id="summary-timeframe-title">Summary</span>
+        </div>
+        <div id="summary-answer" class="summary-answer"></div>
+      </div>
+    </section>
+
+    <!-- AI Search Section -->
+    <section id="ai-section" class="ai-section mb-8">
+      <div class="ai-search-glow"></div>
+      <div class="ai-header">
+        <i class="fas fa-robot ai-header-icon"></i>
+        <h2 class="ai-header-title">Ask AI</h2>
+        <span class="ai-header-badge">RAG</span>
+      </div>
+      <p class="ai-subtitle">Ask a question about current affairs. AI will search through stored tweets to find answers.</p>
+      <div class="ai-input-wrapper">
+        <div class="ai-input-glow"></div>
+        <input type="text" id="ai-query" class="ai-input" placeholder="e.g. What's happening with Japan's population?" />
+        <button id="ai-search-btn" class="ai-search-btn" onclick="askAI()">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <div id="ai-loading" class="ai-loading" style="display: none;">
+        <div class="ai-spinner"></div>
+        <span>Searching tweets & generating answer...</span>
+      </div>
+      <div id="ai-response" class="ai-response" style="display: none;">
+        <div class="ai-response-header">
+          <i class="fas fa-sparkles"></i>
+          <span>AI Response</span>
+        </div>
+        <div id="ai-answer" class="ai-answer"></div>
+      </div>
+    </section>
+
     <!-- Results -->
     <section id="results" class="rounded-lg p-6">
       <h2 class="text-xl font-bold mb-4">Search Results</h2>
