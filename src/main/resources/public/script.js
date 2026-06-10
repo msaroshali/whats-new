@@ -66,6 +66,131 @@ function breaking() {
   });
 }
 
+async function askAI() {
+  const queryField = document.getElementById("ai-query");
+  const query = queryField.value.trim();
+  if (!query) return;
+
+  const loadingDiv = document.getElementById("ai-loading");
+  const responseDiv = document.getElementById("ai-response");
+  const answerDiv = document.getElementById("ai-answer");
+
+  // Show loading, hide previous response
+  loadingDiv.style.display = "flex";
+  responseDiv.style.display = "none";
+  answerDiv.innerHTML = "";
+
+  try {
+    const res = await fetch(`/ai-search?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+
+    if (data.error) {
+      answerDiv.innerHTML = `<p class="text-red-500 font-semibold">Error: ${data.error}</p>`;
+    } else {
+      answerDiv.innerHTML = formatMarkdown(data.answer);
+    }
+  } catch (err) {
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+    answerDiv.innerHTML = `<p class="text-red-500 font-semibold">Fetch Error: ${err.message || err}</p>`;
+  }
+}
+
+async function fetchSummary(timeframe, element) {
+  const loadingDiv = document.getElementById("summary-loading");
+  const responseDiv = document.getElementById("summary-response");
+  const answerDiv = document.getElementById("summary-answer");
+  const titleSpan = document.getElementById("summary-timeframe-title");
+
+  // Toggle active class for tabs
+  const tabs = document.querySelectorAll(".summary-tab-btn");
+  tabs.forEach(t => t.classList.remove("active"));
+  if (element) {
+    element.classList.add("active");
+  }
+
+  // Set header title
+  const formattedTimeframe = timeframe.charAt(0).toUpperCase() + timeframe.slice(1);
+  titleSpan.textContent = `AI News Summary (Past ${formattedTimeframe})`;
+
+  // Show loading, hide response
+  loadingDiv.style.display = "flex";
+  responseDiv.style.display = "none";
+  answerDiv.innerHTML = "";
+
+  try {
+    const res = await fetch(`/summary?timeframe=${timeframe}`);
+    const data = await res.json();
+
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+
+    if (data.error) {
+      answerDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: ${data.error}</p>`;
+    } else {
+      answerDiv.innerHTML = formatMarkdown(data.answer);
+    }
+  } catch (err) {
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+    answerDiv.innerHTML = `<p style="color: red; font-weight: bold;">Fetch Error: ${err.message || err}</p>`;
+  }
+}
+
+// Simple client-side Markdown formatter
+function formatMarkdown(text) {
+  if (!text) return "";
+  
+  // Escape HTML to prevent XSS
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Convert bold text (**text**)
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // Convert inline code (`code`)
+  html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+
+  // Convert paragraphs and bullet lists
+  const sections = html.split("\n\n");
+  html = sections.map(section => {
+    const lines = section.split("\n").map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) return "";
+    
+    // Check if the section is a bullet list
+    if (lines[0].startsWith("- ") || lines[0].startsWith("* ")) {
+      const listItems = lines.map(line => {
+        const cleanedLine = line.replace(/^[-*]\s+/, "");
+        return `<li>${cleanedLine}</li>`;
+      }).join("");
+      return `<ul class="list-disc pl-5 my-2 space-y-1">${listItems}</ul>`;
+    }
+    
+    // Default to a standard paragraph
+    return `<p class="mb-3 leading-relaxed">${section.replace(/\n/g, "<br>")}</p>`;
+  }).join("");
+
+  return html;
+}
+
+// Trigger AI Search on Enter key press
+document.addEventListener("DOMContentLoaded", () => {
+  const queryField = document.getElementById("ai-query");
+  if (queryField) {
+    queryField.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        askAI();
+      }
+    });
+  }
+});
+
+
 //Gallery of news sources
 document.addEventListener('DOMContentLoaded', () => {
     const gallery = document.querySelector('.gallery');
@@ -120,15 +245,15 @@ document.addEventListener('DOMContentLoaded', () => {
 async function getNews() {
   const username = document.getElementById("username").value;
 
-    const res = await fetch(`/latest?username=${encodeURIComponent(username)}`);
-    // const res = await fetch(`/latest?limit=${limit}`);
-    const tweets = await res.json();
-  
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = ""; // clear old
-    
-    // 1. Create the table structure outside the loop
-       let tableHTML = `
+  const res = await fetch(`/latest?username=${encodeURIComponent(username)}`);
+  // const res = await fetch(`/latest?limit=${limit}`);
+  const tweets = await res.json();
+
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.innerHTML = ""; // clear old
+
+  // 1. Create the table structure outside the loop
+  let tableHTML = `
        <table id="example" class="display">
            <thead>
                <tr>
@@ -141,8 +266,8 @@ async function getNews() {
            <tbody>
    `;
 
-    tweets.forEach(t => {
-        tableHTML += `
+  tweets.forEach(t => {
+    tableHTML += `
         <tr>
             <td>${t.username}</td>
             <td>${t.date}</td>
@@ -150,24 +275,24 @@ async function getNews() {
             <td>${t.sourceUrl}</td>
         </tr>
     `;
-         // div.innerHTML = `<strong>@${t.username}</strong>: ${t.content} <em>(${t.date})</em>`;
-      //resultsDiv.appendChild(div);
-    });
-          tableHTML += `
+    // div.innerHTML = `<strong>@${t.username}</strong>: ${t.content} <em>(${t.date})</em>`;
+    //resultsDiv.appendChild(div);
+  });
+  tableHTML += `
               </tbody>
           </table>
       `;
 
-      results.innerHTML += tableHTML;
-      new DataTable('#example', {
-        ordering: false
+  results.innerHTML += tableHTML;
+  new DataTable('#example', {
+    ordering: false
 
-    });
+  });
 
-  }
+}
 
 
-  // Dark mode toggle
+// Dark mode toggle
 
   document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("theme-toggle");

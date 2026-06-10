@@ -12,3 +12,4 @@ target/
 .vscode/settings.json
 node_modules/
 .env
+logs/application.log
