@@ -84,6 +84,14 @@ async function askAI() {
     const res = await fetch(`/ai-search?q=${encodeURIComponent(query)}`);
     const data = await res.json();
 
+    if (res.status === 503 && data.retry) {
+      answerDiv.innerHTML = `<p class="text-yellow-500 font-semibold"><i class="fas fa-sync fa-spin mr-2"></i>${data.error}</p>`;
+      loadingDiv.style.display = "none";
+      responseDiv.style.display = "block";
+      setTimeout(() => askAI(), 2000);
+      return;
+    }
+
     loadingDiv.style.display = "none";
     responseDiv.style.display = "block";
 
@@ -106,9 +114,9 @@ async function fetchSummary(timeframe, element) {
   const titleSpan = document.getElementById("summary-timeframe-title");
 
   // Toggle active class for tabs
-  const tabs = document.querySelectorAll(".summary-tab-btn");
-  tabs.forEach(t => t.classList.remove("active"));
   if (element) {
+    const tabs = document.querySelectorAll(".summary-tab-btn");
+    tabs.forEach(t => t.classList.remove("active"));
     element.classList.add("active");
   }
 
@@ -124,6 +132,14 @@ async function fetchSummary(timeframe, element) {
   try {
     const res = await fetch(`/summary?timeframe=${timeframe}`);
     const data = await res.json();
+
+    if (res.status === 503 && data.retry) {
+      answerDiv.innerHTML = `<p style="color: #f59e0b; font-weight: bold;"><i class="fas fa-sync fa-spin mr-2"></i>${data.error}</p>`;
+      loadingDiv.style.display = "none";
+      responseDiv.style.display = "block";
+      setTimeout(() => fetchSummary(timeframe, null), 2000);
+      return;
+    }
 
     loadingDiv.style.display = "none";
     responseDiv.style.display = "block";
@@ -318,3 +334,48 @@ async function getNews() {
     });
   });
   
+// Live Ticker logic
+async function fetchTickerNews() {
+  try {
+    const res = await fetch('/ticker');
+    const tweets = await res.json();
+    
+    const track = document.getElementById('ticker-track');
+    if (!track) return;
+    
+    if (!tweets || tweets.length === 0) {
+      track.innerHTML = '<span class="ticker-item text-gray-500">No recent news available.</span>';
+      return;
+    }
+
+    let html = '';
+    // Duplicate tweets a few times to ensure seamless infinite scroll
+    for (let i = 0; i < 3; i++) {
+      tweets.forEach(t => {
+        let text = t.content;
+        if (text && text.length > 100) {
+          text = text.substring(0, 100) + '...';
+        }
+        // Safely extract the source URL or use #
+        let url = t.sourceUrl || '#';
+        if (url && url !== '#') {
+          // If the tweet has a URL in the text itself, sometimes we want to render it, but we can just link the text
+        }
+
+        html += `
+          <span class="ticker-item">
+            <span class="ticker-source">@${t.username}</span>
+            <a href="${url}" target="_blank" class="ticker-link" title="${t.content}">${text}</a>
+            <i class="fas fa-circle ticker-separator"></i>
+          </span>
+        `;
+      });
+    }
+    
+    track.innerHTML = html;
+  } catch (err) {
+    console.error('Failed to fetch ticker news:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', fetchTickerNews);

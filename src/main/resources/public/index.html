@@ -43,6 +43,19 @@
   <!-- Main Content -->
   <main class="pt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
+    <!-- Live Ticker -->
+    <div class="live-ticker-container mb-6">
+      <div class="ticker-glow"></div>
+      <div class="live-ticker-label">
+        <i class="fas fa-bolt ticker-icon"></i> <span class="ticker-label-text">LIVE</span>
+      </div>
+      <div class="live-ticker-scroll">
+        <div class="live-ticker-track" id="ticker-track">
+          <span class="ticker-item text-gray-500 dark:text-gray-400">Loading latest news...</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Search Options -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <div class="flex items-center bg-white rounded-lg shadow px-3 py-2">
