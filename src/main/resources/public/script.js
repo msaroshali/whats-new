@@ -23,9 +23,10 @@ function breaking() {
           <table id="example" class="display">
               <thead>
                   <tr>
+                      <th>Source</th>
                       <th>Date and Time</th>
                       <th>Tweet</th>
-                      <th>Source</th>
+                      <th>Url</th>
                   </tr>
               </thead>
               <tbody>
@@ -39,6 +40,7 @@ function breaking() {
           } else {
               tableHTML += `
                   <tr>
+                      <td>${tweet.username}</td>
                       <td>${tweet.date}</td>
                       <td>${tweet.content}</td>
                       <td><a href="${tweet.sourceUrl}" target="_blank">${tweet.sourceUrl}</a></td>
@@ -63,6 +65,147 @@ function breaking() {
       document.getElementById("results").innerHTML = `<p style="color:red;">Fetch error: ${err}</p>`;
   });
 }
+
+async function askAI() {
+  const queryField = document.getElementById("ai-query");
+  const query = queryField.value.trim();
+  if (!query) return;
+
+  const loadingDiv = document.getElementById("ai-loading");
+  const responseDiv = document.getElementById("ai-response");
+  const answerDiv = document.getElementById("ai-answer");
+
+  // Show loading, hide previous response
+  loadingDiv.style.display = "flex";
+  responseDiv.style.display = "none";
+  answerDiv.innerHTML = "";
+
+  try {
+    const res = await fetch(`/ai-search?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+
+    if (res.status === 503 && data.retry) {
+      answerDiv.innerHTML = `<p class="text-yellow-500 font-semibold"><i class="fas fa-sync fa-spin mr-2"></i>${data.error}</p>`;
+      loadingDiv.style.display = "none";
+      responseDiv.style.display = "block";
+      setTimeout(() => askAI(), 2000);
+      return;
+    }
+
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+
+    if (data.error) {
+      answerDiv.innerHTML = `<p class="text-red-500 font-semibold">Error: ${data.error}</p>`;
+    } else {
+      answerDiv.innerHTML = formatMarkdown(data.answer);
+    }
+  } catch (err) {
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+    answerDiv.innerHTML = `<p class="text-red-500 font-semibold">Fetch Error: ${err.message || err}</p>`;
+  }
+}
+
+async function fetchSummary(timeframe, element) {
+  const loadingDiv = document.getElementById("summary-loading");
+  const responseDiv = document.getElementById("summary-response");
+  const answerDiv = document.getElementById("summary-answer");
+  const titleSpan = document.getElementById("summary-timeframe-title");
+
+  // Toggle active class for tabs
+  if (element) {
+    const tabs = document.querySelectorAll(".summary-tab-btn");
+    tabs.forEach(t => t.classList.remove("active"));
+    element.classList.add("active");
+  }
+
+  // Set header title
+  const formattedTimeframe = timeframe.charAt(0).toUpperCase() + timeframe.slice(1);
+  titleSpan.textContent = `AI News Summary (Past ${formattedTimeframe})`;
+
+  // Show loading, hide response
+  loadingDiv.style.display = "flex";
+  responseDiv.style.display = "none";
+  answerDiv.innerHTML = "";
+
+  try {
+    const res = await fetch(`/summary?timeframe=${timeframe}`);
+    const data = await res.json();
+
+    if (res.status === 503 && data.retry) {
+      answerDiv.innerHTML = `<p style="color: #f59e0b; font-weight: bold;"><i class="fas fa-sync fa-spin mr-2"></i>${data.error}</p>`;
+      loadingDiv.style.display = "none";
+      responseDiv.style.display = "block";
+      setTimeout(() => fetchSummary(timeframe, null), 2000);
+      return;
+    }
+
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+
+    if (data.error) {
+      answerDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: ${data.error}</p>`;
+    } else {
+      answerDiv.innerHTML = formatMarkdown(data.answer);
+    }
+  } catch (err) {
+    loadingDiv.style.display = "none";
+    responseDiv.style.display = "block";
+    answerDiv.innerHTML = `<p style="color: red; font-weight: bold;">Fetch Error: ${err.message || err}</p>`;
+  }
+}
+
+// Simple client-side Markdown formatter
+function formatMarkdown(text) {
+  if (!text) return "";
+  
+  // Escape HTML to prevent XSS
+  let html = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Convert bold text (**text**)
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+  // Convert inline code (`code`)
+  html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+
+  // Convert paragraphs and bullet lists
+  const sections = html.split("\n\n");
+  html = sections.map(section => {
+    const lines = section.split("\n").map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) return "";
+    
+    // Check if the section is a bullet list
+    if (lines[0].startsWith("- ") || lines[0].startsWith("* ")) {
+      const listItems = lines.map(line => {
+        const cleanedLine = line.replace(/^[-*]\s+/, "");
+        return `<li>${cleanedLine}</li>`;
+      }).join("");
+      return `<ul class="list-disc pl-5 my-2 space-y-1">${listItems}</ul>`;
+    }
+    
+    // Default to a standard paragraph
+    return `<p class="mb-3 leading-relaxed">${section.replace(/\n/g, "<br>")}</p>`;
+  }).join("");
+
+  return html;
+}
+
+// Trigger AI Search on Enter key press
+document.addEventListener("DOMContentLoaded", () => {
+  const queryField = document.getElementById("ai-query");
+  if (queryField) {
+    queryField.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        askAI();
+      }
+    });
+  }
+});
+
 
 //Gallery of news sources
 document.addEventListener('DOMContentLoaded', () => {
@@ -118,52 +261,54 @@ document.addEventListener('DOMContentLoaded', () => {
 async function getNews() {
   const username = document.getElementById("username").value;
 
-    const res = await fetch(`/latest?username=${encodeURIComponent(username)}`);
-    // const res = await fetch(`/latest?limit=${limit}`);
-    const tweets = await res.json();
-  
-    const resultsDiv = document.getElementById("results");
-    resultsDiv.innerHTML = ""; // clear old
-    
-    // 1. Create the table structure outside the loop
-       let tableHTML = `
+  const res = await fetch(`/latest?username=${encodeURIComponent(username)}`);
+  // const res = await fetch(`/latest?limit=${limit}`);
+  const tweets = await res.json();
+
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.innerHTML = ""; // clear old
+
+  // 1. Create the table structure outside the loop
+  let tableHTML = `
        <table id="example" class="display">
            <thead>
                <tr>
                    <th>Source</th>
                    <th>Date and Time</th>
                    <th>Tweet</th>
+                   <th>Url</th>
                </tr>
            </thead>
            <tbody>
    `;
 
-    tweets.forEach(t => {
-        tableHTML += `
+  tweets.forEach(t => {
+    tableHTML += `
         <tr>
             <td>${t.username}</td>
             <td>${t.date}</td>
             <td>${t.content}</td>
+            <td>${t.sourceUrl}</td>
         </tr>
     `;
-         // div.innerHTML = `<strong>@${t.username}</strong>: ${t.content} <em>(${t.date})</em>`;
-      //resultsDiv.appendChild(div);
-    });
-          tableHTML += `
+    // div.innerHTML = `<strong>@${t.username}</strong>: ${t.content} <em>(${t.date})</em>`;
+    //resultsDiv.appendChild(div);
+  });
+  tableHTML += `
               </tbody>
           </table>
       `;
 
-      results.innerHTML += tableHTML;
-      new DataTable('#example', {
-        ordering: false
+  results.innerHTML += tableHTML;
+  new DataTable('#example', {
+    ordering: false
 
-    });
+  });
 
-  }
+}
 
 
-  // Dark mode toggle
+// Dark mode toggle
 
   document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("theme-toggle");
@@ -189,3 +334,48 @@ async function getNews() {
     });
   });
   
+// Live Ticker logic
+async function fetchTickerNews() {
+  try {
+    const res = await fetch('/ticker');
+    const tweets = await res.json();
+    
+    const track = document.getElementById('ticker-track');
+    if (!track) return;
+    
+    if (!tweets || tweets.length === 0) {
+      track.innerHTML = '<span class="ticker-item text-gray-500">No recent news available.</span>';
+      return;
+    }
+
+    let html = '';
+    // Duplicate tweets a few times to ensure seamless infinite scroll
+    for (let i = 0; i < 3; i++) {
+      tweets.forEach(t => {
+        let text = t.content;
+        if (text && text.length > 100) {
+          text = text.substring(0, 100) + '...';
+        }
+        // Safely extract the source URL or use #
+        let url = t.sourceUrl || '#';
+        if (url && url !== '#') {
+          // If the tweet has a URL in the text itself, sometimes we want to render it, but we can just link the text
+        }
+
+        html += `
+          <span class="ticker-item">
+            <span class="ticker-source">@${t.username}</span>
+            <a href="${url}" target="_blank" class="ticker-link" title="${t.content}">${text}</a>
+            <i class="fas fa-circle ticker-separator"></i>
+          </span>
+        `;
+      });
+    }
+    
+    track.innerHTML = html;
+  } catch (err) {
+    console.error('Failed to fetch ticker news:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', fetchTickerNews);

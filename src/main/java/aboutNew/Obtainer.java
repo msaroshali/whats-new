@@ -2,6 +2,7 @@ package aboutNew;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class Obtainer {
         // pb.redirectErrorStream(true);
         Process process = pb.start();
     
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
         StringBuilder output = new StringBuilder();
         String line;
         while ((line = reader.readLine()) != null) {
@@ -65,6 +66,7 @@ public class Obtainer {
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject o = arr.getJSONObject(i);
                 Map<String, String> tweet = new HashMap<>();
+                if (o.has("username")) tweet.put("username", o.getString("username"));
                 if (o.has("date")) tweet.put("date", o.getString("date"));
                 if (o.has("content")) tweet.put("content", o.getString("content"));
                 if (o.has("sourceUrl")) tweet.put("sourceUrl", o.getString("sourceUrl"));

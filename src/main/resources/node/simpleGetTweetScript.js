@@ -138,6 +138,7 @@ fetch(fullUrl, {
                 }
 
                 tweets.push({
+                    username: username || entry.content.itemContent.tweet_results.result.core.user_results.result.legacy.screen_name,
                     date: legacy.created_at,
                     content: legacy.full_text,
                     sourceUrl: url

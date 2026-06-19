@@ -36,7 +36,7 @@ public class Find {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
                 TweetController.fetchAndSaveDefaultSources();
-        }, 0, 63, TimeUnit.MINUTES);    
+        }, 1, 63, TimeUnit.MINUTES);    
     }
 
 }
