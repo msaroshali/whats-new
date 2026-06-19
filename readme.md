@@ -75,3 +75,6 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 
 ## 📝 License
 This project is licensed under the MIT License.
+# Technology
+Uses Javalin as a web server. Javalin is a minuscule web server framework comes as a small wrapper wrapped over ninja jetty.
+Using Tailwind, JavaScript for frontend at the moment.
