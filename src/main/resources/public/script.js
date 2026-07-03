@@ -312,10 +312,16 @@ async function getNews() {
 
   document.addEventListener("DOMContentLoaded", () => {
     const toggleBtn = document.getElementById("theme-toggle");
+    const girlyBtn = document.getElementById("girly-toggle");
     const html = document.documentElement; // use <html> or <body>
+    const body = document.body;
 
     if(localStorage.getItem("theme") === "dark") {
         html.classList.add("dark");
+    }
+    
+    if(localStorage.getItem("girlyTheme") === "true") {
+        body.classList.add("girly-theme");
     }
 
     toggleBtn.addEventListener("click", () => {
@@ -332,6 +338,13 @@ async function getNews() {
         icon.classList.replace("fa-sun", "fa-moon");
       }
     });
+
+    if (girlyBtn) {
+      girlyBtn.addEventListener("click", () => {
+        body.classList.toggle("girly-theme");
+        localStorage.setItem("girlyTheme", body.classList.contains("girly-theme"));
+      });
+    }
   });
   
 // Live Ticker logic
@@ -378,4 +391,4 @@ async function fetchTickerNews() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', fetchTickerNews);
+document.addEventListener('DOMContentLoaded', fetchTickerNews);

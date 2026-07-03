@@ -677,3 +677,76 @@
 .dark .ticker-separator {
   color: #4b5563;
 }
+
+/* ========================================
+   Girly Theme (Secret)
+   ======================================== */
+
+
+.heart-toggle {
+  background-color: transparent !important;
+    opacity: 6%;
+}
+
+.girly-theme .heart-toggle {
+  background-color: transparent !important;
+    opacity: 100%;
+  }
+
+  .girly-theme {
+  background-color: #ffe6f2 !important;
+  background-image: url('cute_cats.png') !important;
+  background-size: 300px !important;
+  background-repeat: repeat !important;
+  background-blend-mode: overlay !important;
+  color: #d10074 !important;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif !important;
+}
+
+.girly-theme nav {
+  background-color: rgba(255, 192, 225, 0.9) !important;
+  color: #d10074 !important;
+}
+
+.girly-theme .ai-section,
+.girly-theme .summary-section,
+.girly-theme .live-ticker-container,
+.girly-theme .ai-search-container,
+.girly-theme .summary-container {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: #ff80bf !important;
+}
+
+.girly-theme .ai-header-title,
+.girly-theme .summary-header-title,
+.girly-theme .ticker-label-text,
+.girly-theme .ai-header-icon,
+.girly-theme .summary-header-icon,
+.girly-theme .ticker-icon,
+.girly-theme .ticker-link:hover {
+  background: linear-gradient(135deg, #ff1493, #ff69b4) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #ff1493 !important;
+}
+
+.girly-theme .ai-search-glow,
+.girly-theme .ai-summary-glow,
+.girly-theme .ticker-glow {
+  background: linear-gradient(135deg, #ff1493, #ff69b4, #ffb6c1, #ff1493) !important;
+}
+
+.girly-theme .summary-tab-btn,
+.girly-theme .summary-tab-btn.active {
+  background-color: #ff69b4 !important;
+  color: white !important;
+  border-color: #ff1493 !important;
+}
+
+.girly-theme button:hover {
+  background-color: #ff1493 !important;
+}
+
+.girly-theme a {
+  color: #ff1493 !important;
+}
