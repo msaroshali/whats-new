@@ -12,8 +12,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Obtainer {
+    private static final Logger logger = LoggerFactory.getLogger(Obtainer.class);
+
     public static List<Map<String, String>> getTweets(String keyword, String username) throws Exception {
 
         Dotenv dotenv = Dotenv.load();
@@ -45,10 +49,10 @@ public class Obtainer {
         }
     
         String outputStr = output.toString().trim();
-        System.out.println("*******************Node OUTPUT:\n*************" + outputStr);
+        logger.info("*******************Node OUTPUT:\n*************\n{}", outputStr);
     
         if (!outputStr.startsWith("[") && !outputStr.startsWith("{")) {
-            System.err.println("nodeJs script returned THIS instead: " + "'" +outputStr+ "'");
+            logger.error("nodeJs script returned THIS instead: '{}'", outputStr);
             return Collections.singletonList(Map.of("error", "Returned JSON from nodeJs script: " + "'" +outputStr+ "'"));
         }
         
@@ -75,7 +79,7 @@ public class Obtainer {
             }
             return tweets;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error reading retrieved JSON", e);
             return Collections.singletonList(Map.of("error reading retrieved JSON", e.getMessage()));
         }
     }
