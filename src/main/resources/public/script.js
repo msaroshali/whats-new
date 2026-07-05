@@ -98,7 +98,7 @@ async function askAI() {
     if (data.error) {
       answerDiv.innerHTML = `<p class="text-red-500 font-semibold">Error: ${data.error}</p>`;
     } else {
-      answerDiv.innerHTML = formatMarkdown(data.answer);
+      answerDiv.innerHTML = data.answer;
     }
   } catch (err) {
     loadingDiv.style.display = "none";
@@ -147,7 +147,7 @@ async function fetchSummary(timeframe, element) {
     if (data.error) {
       answerDiv.innerHTML = `<p style="color: red; font-weight: bold;">Error: ${data.error}</p>`;
     } else {
-      answerDiv.innerHTML = formatMarkdown(data.answer);
+      answerDiv.innerHTML = data.answer;
     }
   } catch (err) {
     loadingDiv.style.display = "none";
@@ -156,43 +156,7 @@ async function fetchSummary(timeframe, element) {
   }
 }
 
-// Simple client-side Markdown formatter
-function formatMarkdown(text) {
-  if (!text) return "";
-  
-  // Escape HTML to prevent XSS
-  let html = text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  // Convert bold text (**text**)
-  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-  // Convert inline code (`code`)
-  html = html.replace(/`(.*?)`/g, "<code>$1</code>");
-
-  // Convert paragraphs and bullet lists
-  const sections = html.split("\n\n");
-  html = sections.map(section => {
-    const lines = section.split("\n").map(l => l.trim()).filter(Boolean);
-    if (lines.length === 0) return "";
-    
-    // Check if the section is a bullet list
-    if (lines[0].startsWith("- ") || lines[0].startsWith("* ")) {
-      const listItems = lines.map(line => {
-        const cleanedLine = line.replace(/^[-*]\s+/, "");
-        return `<li>${cleanedLine}</li>`;
-      }).join("");
-      return `<ul class="list-disc pl-5 my-2 space-y-1">${listItems}</ul>`;
-    }
-    
-    // Default to a standard paragraph
-    return `<p class="mb-3 leading-relaxed">${section.replace(/\n/g, "<br>")}</p>`;
-  }).join("");
-
-  return html;
-}
+// Removed client-side formatMarkdown since we now do it on the server-side
 
 // Trigger AI Search on Enter key press
 document.addEventListener("DOMContentLoaded", () => {
