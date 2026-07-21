@@ -8,9 +8,13 @@ import aboutNew.Obtainer;
 import aboutNew.dao.TweetDAO;
 import aboutNew.model.Tweet;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TweetController {
+    private static final Logger logger = LoggerFactory.getLogger(TweetController.class);
 
+    //Breaking
     public static void search(Context ctx)
     {
         String keyword = ctx.queryParam("keyword");
@@ -30,19 +34,23 @@ public class TweetController {
                 fetchedTweets.add(t);   
             }
 
-            System.out.println("Saving tweets to database...");
-
+            logger.info("Breaking Tweets fetched successfully. Total: {}", fetchedTweets.size());
+            logger.info("Saving only newer tweets to database...");
+            
+            int insertedCount = 0;
             for (Tweet t : fetchedTweets) {
-                TweetDAO.saveTweet(t);
+                insertedCount += TweetDAO.saveTweet(t);
             }
-            System.out.println("Tweets saved to database successfully.");
 
+            logger.info("Inserted: {}, Ignored: {}", insertedCount, (rawTweets.size() - insertedCount));
+            logger.info("Process execution successful for {}", username.toUpperCase());
+            
             // Return JSON to frontend
             ctx.contentType("application/json; charset=utf-8");
             ctx.json(rawTweets);
             
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in search endpoint", e);
             ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
         }
     }
@@ -52,10 +60,10 @@ public class TweetController {
 
         try {
             int limit = 200; // default
-            // String limitParam = ctx.queryParam("limit");
-            // if (limitParam != null) {
-            //     limit = Integer.parseInt(limitParam);
-            // }
+            String limitParam = ctx.queryParam("limit");
+            if (limitParam != null) {
+                limit = Integer.parseInt(limitParam);
+            }
     
             List<Tweet> latestTweets = TweetDAO.getLatestTweets(limit, username);
     
@@ -73,7 +81,7 @@ public class TweetController {
             ctx.json(response);
     
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in latest endpoint", e);
             ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
         }
     }
@@ -86,8 +94,8 @@ public class TweetController {
                 List<Map<String, String>> rawTweets = Obtainer.getTweets("", username);
 
                 if (!rawTweets.isEmpty()) {
-
-                    System.out.println("Auto Saving " + username.toUpperCase() + " tweets to database...");
+                    logger.info("Auto fetch of Tweets successfully for {}. Total: {}", username.toUpperCase(), rawTweets.size());
+                    logger.info("Saving only newer tweets to database...");
                     int insertedCount = 0;
                     for (Map<String, String> map : rawTweets) {
                         String date = map.getOrDefault("date", "");
@@ -99,13 +107,13 @@ public class TweetController {
 
 
                     }
-                    System.out.println("Tweets saved to database successfully. Inserted: " + insertedCount + ", Ignored: " + (rawTweets.size() - insertedCount));
 
-                    System.out.println("Auto save of " + username.toUpperCase() + " tweets to database successful");
+                    logger.info("Inserted: {}, Ignored: {}", insertedCount, (rawTweets.size() - insertedCount));
+                    logger.info("Process execution successful for {}", username.toUpperCase());
 
                 } 
                 else {
-                    System.out.println("No tweets found for " + username.toUpperCase() + ". Skipping...");
+                    logger.info("No tweets found for {}. Skipping...", username.toUpperCase());
                 }
 
                 Thread.sleep(25000);
@@ -113,7 +121,7 @@ public class TweetController {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in fetchAndSaveDefaultSources", e);
         }
     }
 }
