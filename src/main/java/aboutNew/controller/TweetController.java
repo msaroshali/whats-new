@@ -1,10 +1,13 @@
 package aboutNew.controller;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import aboutNew.Obtainer;
+import aboutNew.EmbeddingService;
+import aboutNew.GeminiService;
 import aboutNew.dao.TweetDAO;
 import aboutNew.model.Tweet;
 import io.javalin.http.Context;
@@ -86,6 +89,97 @@ public class TweetController {
         }
     }
 
+    public static void ticker(Context ctx) {
+        try {
+            List<Tweet> tickerTweets = TweetDAO.getTickerTweets();
+            Collections.shuffle(tickerTweets); // Randomize the tweets
+
+            List<Map<String, String>> response = new ArrayList<>();
+            for (Tweet t : tickerTweets) {
+                response.add(Map.of(
+                    "username", Objects.toString(t.getUsername(), ""),
+                    "content", Objects.toString(t.getContent(), ""),
+                    "date", Objects.toString(t.getDate(), ""),
+                    "sourceUrl", Objects.toString(t.getSource(), "")
+                ));
+            }
+            ctx.contentType("application/json; charset=utf-8");
+            ctx.json(response);
+        } catch (Exception e) {
+            logger.error("Error in ticker endpoint", e);
+            ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
+        }
+    }
+
+    public static String formatMarkdownToServerSideHTML(String text) {
+        if (text == null) return "";
+        
+        // Escape HTML to prevent XSS
+        String html = text.replace("&", "&amp;")
+                          .replace("<", "&lt;")
+                          .replace(">", "&gt;");
+                          
+        // Convert links [text](url) - tolerate spaces between ] and (
+        html = html.replaceAll("\\[([^\\]]+)\\]\\s*\\(([^)]+)\\)", "<a href=\"$2\" target=\"_blank\" class=\"text-blue-500 underline hover:text-blue-700\">$1</a>");
+        
+        // Convert bold **text**
+        html = html.replaceAll("\\*\\*(.*?)\\*\\*", "<strong>$1</strong>");
+        
+        // Convert inline code `code`
+        html = html.replaceAll("`(.*?)`", "<code>$1</code>");
+        
+        // Process line by line for blocks (headings, lists, paragraphs)
+        StringBuilder sb = new StringBuilder();
+        String[] lines = html.split("\n");
+        boolean inList = false;
+        
+        for (String line : lines) {
+            String trimmed = line.trim();
+            
+            if (trimmed.isEmpty()) {
+                if (inList) {
+                    sb.append("</ul>");
+                    inList = false;
+                }
+                continue;
+            }
+            
+            if (trimmed.startsWith("### ")) {
+                if (inList) {
+                    sb.append("</ul>");
+                    inList = false;
+                }
+                sb.append("<h3 class=\"text-lg font-bold mt-4 mb-2 text-blue-600 dark:text-blue-400\">")
+                  .append(trimmed.substring(4)).append("</h3>");
+            } else if (trimmed.startsWith("## ")) {
+                if (inList) {
+                    sb.append("</ul>");
+                    inList = false;
+                }
+                sb.append("<h2 class=\"text-xl font-bold mt-5 mb-3 text-blue-700 dark:text-blue-300\">")
+                  .append(trimmed.substring(3)).append("</h2>");
+            } else if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+                if (!inList) {
+                    sb.append("<ul class=\"list-disc pl-5 my-2 space-y-1\">");
+                    inList = true;
+                }
+                sb.append("<li>").append(trimmed.substring(2)).append("</li>");
+            } else {
+                if (inList) {
+                    sb.append("</ul>");
+                    inList = false;
+                }
+                sb.append("<p class=\"mb-3 leading-relaxed\">").append(trimmed).append("</p>");
+            }
+        }
+        
+        if (inList) {
+            sb.append("</ul>");
+        }
+        
+        return sb.toString();
+    }
+
     public static void fetchAndSaveDefaultSources() {
         try {
             String[] usernames = {"faytuksnetwork", "clashreport",  "Wccftech", "TechCrunch", "verge", "engadget", "TechRadar", "Gizmodo", "TheNextWeb", "DigitalTrends"};
@@ -124,4 +218,6 @@ public class TweetController {
             logger.error("Error in fetchAndSaveDefaultSources", e);
         }
     }
+
+   
 }
