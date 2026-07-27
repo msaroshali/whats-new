@@ -23,6 +23,107 @@ import java.util.Locale;
 public class TweetController {
     private static final Logger logger = LoggerFactory.getLogger(TweetController.class);
 
+    public static void timeframeSummary(Context ctx) {
+        String timeframe = ctx.queryParam("timeframe");
+        if (timeframe == null || timeframe.trim().isEmpty()) {
+            ctx.status(400).json(Map.of("error", "Query parameter 'timeframe' is required."));
+            return;
+        }
+
+        try {
+            // Retrieve latest 3000 tweets
+            List<Tweet> allTweets = TweetDAO.getLatestTweets(3000, null);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss Z yyyy", Locale.US);
+            
+            Instant now = Instant.now();
+            Instant cutoff;
+            if ("hour".equalsIgnoreCase(timeframe)) {
+                cutoff = now.minus(1, ChronoUnit.HOURS);
+            } else if ("day".equalsIgnoreCase(timeframe)) {
+                cutoff = now.minus(24, ChronoUnit.HOURS);
+            } else if ("week".equalsIgnoreCase(timeframe)) {
+                cutoff = now.minus(7, ChronoUnit.DAYS);
+            } else {
+                ctx.status(400).json(Map.of("error", "Invalid timeframe parameter. Use 'hour', 'day', or 'week'."));
+                return;
+            }
+
+            // Filter tweets within timeframe
+            List<Tweet> filteredTweets = new ArrayList<>();
+            for (Tweet t : allTweets) {
+                if (t.getDate() == null || t.getDate().trim().isEmpty()) continue;
+                try {
+                    ZonedDateTime tweetTime = ZonedDateTime.parse(t.getDate(), formatter);
+                    if (tweetTime.toInstant().isAfter(cutoff)) {
+                        filteredTweets.add(t);
+                    }
+                } catch (Exception parseEx) {
+                    // Log parsing error but don't break execution
+                    logger.debug("Failed to parse tweet date: {}", t.getDate(), parseEx);
+                }
+            }
+
+            if (filteredTweets.isEmpty()) {
+                ctx.contentType("application/json; charset=utf-8");
+                ctx.json(Map.of("answer", "No news was recorded in the database for the past " + timeframe + "."));
+                return;
+            }
+
+            // Construct context from filtered tweets
+            StringBuilder contextBuilder = new StringBuilder();
+            for (Tweet t : filteredTweets) {
+                contextBuilder.append("- [@").append(t.getUsername())
+                              .append("] (").append(t.getDate()).append("): ")
+                              .append(t.getContent());
+                if (t.getSource() != null && !t.getSource().trim().isEmpty()) {
+                    contextBuilder.append(" [Source Link](").append(t.getSource()).append(")");
+                }
+                contextBuilder.append("\n\n");
+            }
+
+            String context = contextBuilder.toString();
+            String prompt = "## SYSTEM INSTRUCTIONS\n"
+                    + "You are an AI news summarizer informing a user about current affairs based on tweets from the [TWEET CONTEXT] below.\n"
+                    + "The user requested a summary for the timeframe: past " + timeframe + ".\n"
+                    + "Generate a beautifully structured summary of the news within this timeframe. Follow these rules:\n"
+                    + "1. Summarize the major events clearly, grouping them under relevant topic categories (e.g. **Geopolitics**, **Tech**, **Science**, etc.) as markdown headers.\n"
+                    + "2. Use Markdown lists and bold text for key points to ensure maximum scannability.\n"
+                    + "3. Chronologically sort events where appropriate, starting with the most recent.\n"
+                    + "4. Cite sources using clickable Markdown hyperlinks format: `[@username](sourceUrl)` where applicable.\n"
+                    + "5. If there are no relevant events or details, output exactly: \"No news was recorded in the database for the past " + timeframe + ".\"\n\n"
+                    + "## DATA\n"
+                    + "[TWEET CONTEXT]\n"
+                    + (context.isEmpty() ? "(No context tweets available.)" : context) + "\n\n"
+                    + "Please synthesize this data into a coherent and premium summary.";
+            
+            
+            //sent tweets
+            // Log top 10 matches to the console for monitoring
+            logger.info("News from past '{}':", timeframe);
+            logger.info("Total news sent: '{}'", filteredTweets.size());
+            logger.info("Top 10:");
+            for (int i = 0; i < Math.min(10, filteredTweets.size()); i++) {
+                Tweet t = filteredTweets.get(i);
+                logger.info(" - @{}: {}", t.getUsername(), t.getContent());
+            }
+
+            String summary = GeminiService.askGemini(prompt);
+            
+            if ("RETRY_503".equals(summary)) {
+                ctx.status(503).json(Map.of("error", "503 Service Unavailable: Model overloaded. Switching model and retrying...", "retry", true));
+                return;
+            }
+
+
+            String formattedSummary = formatMarkdownToServerSideHTML(summary);
+            ctx.contentType("application/json; charset=utf-8");
+            ctx.json(Map.of("answer", formattedSummary));
+
+        } catch (Exception e) {
+            logger.error("Error in timeframeSummary endpoint", e);
+            ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
+        }
+    }
 
     //Breaking
     public static void search(Context ctx)
