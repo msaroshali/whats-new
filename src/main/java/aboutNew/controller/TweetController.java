@@ -226,4 +226,133 @@ public class TweetController {
         }
     }
 
+    public static void aiSearch(Context ctx) {
+        String question = ctx.queryParam("q");
+        if (question == null || question.trim().isEmpty()) {
+            ctx.status(400).json(Map.of("error", "Query parameter 'q' is required."));
+            return;
+        }
+
+        try {
+            float[] queryEmbedding = EmbeddingService.getEmbedding(question);
+            if (queryEmbedding == null) {
+                ctx.status(503).json(Map.of("error", "Failed to generate query embedding. The embedding API quota might be exhausted."));
+                return;
+            }
+
+            //  Fetch all tweets with embeddings (limit to 1000 for search relevance)
+            List<Tweet> allTweets = TweetDAO.getTweetsForSearch(1000);
+
+            //Compute cosine similarity for each tweet
+            List<ScoredTweet> scoredTweets = new ArrayList<>();
+            for (Tweet t : allTweets) {
+                double score = computeCosineSimilarity(queryEmbedding, t.getEmbedding());
+                scoredTweets.add(new ScoredTweet(t, score));
+            }
+
+            // Sort in descending order
+            Collections.sort(scoredTweets);
+
+            // log top 15 matches to the console for monitoring
+            logger.info("Top matches for AI query: '{}'", question);
+            for (int i = 0; i < Math.min(15, scoredTweets.size()); i++) {
+                ScoredTweet st = scoredTweets.get(i);
+                logger.info(" - [{}] @{}: {}", String.format("%.4f", st.score), st.tweet.getUsername(), st.tweet.getContent());
+            }
+
+            // Build prompt using top 60 matches (or fewer if DB doesn't have 60)
+            int numMatches = Math.min(60, scoredTweets.size());
+            StringBuilder contextBuilder = new StringBuilder();
+            for (int i = 0; i < numMatches; i++) {
+                ScoredTweet st = scoredTweets.get(i);
+                contextBuilder.append("- [@").append(st.tweet.getUsername())
+                              .append("] (").append(st.tweet.getDate()).append("): ")
+                              .append(st.tweet.getContent()).append("\n\n");
+            }
+
+            String context = contextBuilder.toString();
+            // String prompt = "You are an AI assistant helping a user analyze current affairs based on tweets gathered from X/Twitter.\n"
+            //         + "Answer the user's question using only the context of the tweets provided below.\n"
+            //         + "Provide a comprehensive, accurate answer structured in clear Markdown (use lists, bold text, etc., where appropriate).\n"
+            //         + "Reference the usernames or tweet dates inside your answer where helpful.\n"
+            //         + "If the tweets do not contain relevant information to answer the question, output exactly: \"I couldn't find relevant information in the database to answer that question.\"\n\n"
+            //         + "[TWEET CONTEXT]\n"
+            //         + (context.isEmpty() ? "(No context tweets available.)" : context) + "\n\n"
+            //         + "[USER QUESTION]\n"
+            //         + question;
+            String prompt = "## SYSTEM INSTRUCTIONS\n"
+                    + "You are an AI assistant informing a user about current affairs and news based only on tweets from the [TWEET CONTEXT] below.\n"
+                    + "Answer the user's question using only the context of the tweets provided. Follow these formatting rules strictly:\n"
+                    + "1. Start with a brief summary that is easy to read with highlighted text.\n"
+                    + "2. Provide a comprehensive, accurate answer structured in clear Markdown (use lists, bold text, etc., where appropriate) in descending order of date/time.\n"
+                    + "3. Reference the usernames inside your answer where helpful.\n"
+                    + "4. Use Markdown lists and bold text for scannability.\n"
+                    + "5. CRITICAL: Every tweet citation must be a clickable hyperlink using standard Markdown syntax `[Anchor Text](URL)` followed by the date.\n\n"
+
+                    + "## CITATION EXAMPLE\n"
+                    + "When referencing a tweet, format it exactly like this:\n"
+                    + "News about lorem ipsum **@username** [Source Link] [Date: 2021-01-01]\n\n"
+                    
+                    + "## FALLBACK RULES\n"
+                    + "Output exactly \"I couldn't find relevant information in the database to answer that question.\" if:\n"
+                    + "- The tweets do not contain relevant information to answer the question.\n"
+                    + "- The [USER QUESTION] is requesting something outside the context of the provided news.\n\n"
+                    
+                    + "## DATA\n"
+                    + "[TWEET CONTEXT]\n"
+                    + (context.isEmpty() ? "(No context tweets available.)" : context) + "\n\n"
+                    + "[USER QUESTION]\n"
+                    + question;
+
+
+
+            //  Query Gemini
+            String answer = GeminiService.askGemini(prompt);
+
+            if ("RETRY_503".equals(answer)) {
+                ctx.status(503).json(Map.of("error", "503 Service Unavailable: Model overloaded. Switching model and retrying...", "retry", true));
+                return;
+            }
+
+            String formattedAnswer = formatMarkdownToServerSideHTML(answer);
+            // 7. Return answer
+            ctx.contentType("application/json; charset=utf-8");
+            ctx.json(Map.of("answer", formattedAnswer));
+
+        } catch (Exception e) {
+            logger.error("Error in aiSearch endpoint", e);
+            ctx.status(500).json(Map.of("error", "Internal Server Error: " + e.getMessage()));
+        }
+    }
+
+    private static double computeCosineSimilarity(float[] vectorA, float[] vectorB) {
+        if (vectorA == null || vectorB == null || vectorA.length != vectorB.length) {
+            return 0.0;
+        }
+        double dotProduct = 0.0;
+        double normA = 0.0;
+        double normB = 0.0;
+        for (int i = 0; i < vectorA.length; i++) {
+            dotProduct += vectorA[i] * vectorB[i];
+            normA += vectorA[i] * vectorA[i];
+            normB += vectorB[i] * vectorB[i];
+        }
+        if (normA == 0.0 || normB == 0.0) return 0.0;
+        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+    }
+
+    private static class ScoredTweet implements Comparable<ScoredTweet> {
+        Tweet tweet;
+        double score;
+
+        ScoredTweet(Tweet tweet, double score) {
+            this.tweet = tweet;
+            this.score = score;
+        }
+
+        @Override
+        public int compareTo(ScoredTweet o) {
+            return Double.compare(o.score, this.score); // Descending order
+        }
+    }
 }
