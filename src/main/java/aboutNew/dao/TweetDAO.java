@@ -78,4 +78,34 @@ public class TweetDAO {
         return tweets;
     }
 
+    public static List<Tweet> getTweetsForSearch(int limit) {
+        String sql = "SELECT id, username, content, date, source, embedding FROM tweets WHERE embedding IS NOT NULL ORDER BY id DESC LIMIT ?";
+        List<Tweet> tweets = new ArrayList<>();
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, limit);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String username = rs.getString("username");
+                    String content = rs.getString("content");
+                    String date = rs.getString("date");
+                    String source = rs.getString("source");
+                    byte[] embBytes = rs.getBytes("embedding");
+                    float[] emb = byteArrayToFloatArray(embBytes);
+                    
+                    Tweet t = new Tweet(username, content, date, source, emb);
+                    t.setId(id);
+                    tweets.add(t);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching tweets for search", e);
+        }
+
+        return tweets;
+    }
+
+
 }
